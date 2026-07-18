@@ -1,0 +1,75 @@
+# Vendored pricing snapshot (doc §7.5 / Appendix B).
+#
+# This is DATA, not gospel: prices change and this file will drift. It is
+# versioned and user-overridable (see PricingRegistry.load(overrides_path=...)).
+# Every number below was pulled from the provider's own pricing page on the
+# date in `version` — re-verify before trusting this for a real invoice.
+#
+# Source: https://platform.claude.com/docs/en/about-claude/pricing (fetched 2026-07-18)
+#         https://platform.claude.com/docs/en/build-with-claude/prompt-caching (fetched 2026-07-18)
+#         https://developers.openai.com/api/docs/pricing (fetched 2026-07-18)
+#
+# Known simplification: providers report a single `cache_creation` token count
+# with no TTL breakdown in the gen_ai.* usage attributes, but Anthropic prices
+# 5-minute and 1-hour cache writes differently (1.25x vs 2x base input). This
+# registry stores one `cache_write_mult`, set to the 5-minute (default TTL)
+# rate; a 1-hour-TTL-heavy workload will be modestly underpriced here until a
+# richer usage signal is available upstream.
+version: "2026-07-18-verified"
+
+providers:
+  anthropic:
+    # Introductory pricing in effect through 2026-08-31; becomes $3/$15 (same
+    # shape as claude-sonnet-4-6 below) from 2026-09-01. Re-verify after that date.
+    claude-sonnet-5:
+      input: 2.0e-6
+      output: 10.0e-6
+      cache_read_mult: 0.10
+      cache_write_mult: 1.25
+      min_cacheable_prefix_tokens: 1024
+    claude-sonnet-4-6:
+      input: 3.0e-6
+      output: 15.0e-6
+      cache_read_mult: 0.10
+      cache_write_mult: 1.25
+      min_cacheable_prefix_tokens: 1024
+    claude-sonnet-4-5:
+      input: 3.0e-6
+      output: 15.0e-6
+      cache_read_mult: 0.10
+      cache_write_mult: 1.25
+      min_cacheable_prefix_tokens: 1024
+    claude-opus-4-8:
+      input: 5.0e-6
+      output: 25.0e-6
+      cache_read_mult: 0.10
+      cache_write_mult: 1.25
+      min_cacheable_prefix_tokens: 1024
+    claude-haiku-4-5:
+      input: 1.0e-6
+      output: 5.0e-6
+      cache_read_mult: 0.10
+      cache_write_mult: 1.25
+      min_cacheable_prefix_tokens: 4096
+
+  openai:
+    # OpenAI's automatic prompt caching charges no write premium (cache_write_mult
+    # left at 1.0 = base input rate); only reads are discounted.
+    gpt-5.6-sol:
+      input: 5.0e-6
+      output: 30.0e-6
+      cache_read_mult: 0.10
+      cache_write_mult: 1.0
+      min_cacheable_prefix_tokens: 1024
+    gpt-5.6-terra:
+      input: 2.5e-6
+      output: 15.0e-6
+      cache_read_mult: 0.10
+      cache_write_mult: 1.0
+      min_cacheable_prefix_tokens: 1024
+    gpt-5.6-luna:
+      input: 1.0e-6
+      output: 6.0e-6
+      cache_read_mult: 0.10
+      cache_write_mult: 1.0
+      min_cacheable_prefix_tokens: 1024

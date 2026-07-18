@@ -1,0 +1,33 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          { "key": "service.name", "value": { "stringValue": "wattage-example" } }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": { "name": "wattage.examples" },
+          "spans": [
+            {
+              "traceId": "example0000000000000000000000001",
+              "spanId": "span0000000001",
+              "parentSpanId": "",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "1700000000000000000",
+              "endTimeUnixNano": "1700000002500000000",
+              "attributes": [
+                { "key": "gen_ai.provider.name", "value": { "stringValue": "anthropic" } },
+                { "key": "gen_ai.request.model", "value": { "stringValue": "claude-sonnet-4-6" } },
+                { "key": "gen_ai.usage.input_tokens", "value": { "intValue": "18450" } },
+                { "key": "gen_ai.usage.output_tokens", "value": { "intValue": "320" } },
+                { "key": "gen_ai.usage.cache_read_input_tokens", "value": { "intValue": "0" } }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

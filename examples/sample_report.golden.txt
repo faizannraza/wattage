@@ -1,0 +1,16 @@
+╭──── ⚡ wattage — examples/sample_trace.json ────╮
+│ Token Efficiency: A (100)   Total cost: $0.0602 │
+│ quality: unmeasured                             │
+╰─────────────────────────────────────────────────╯
+      Token breakdown      
+┏━━━━━━━━━━━━━━━━┳━━━━━━━━┓
+┃ Category       ┃ Tokens ┃
+┡━━━━━━━━━━━━━━━━╇━━━━━━━━┩
+│ input          │  18450 │
+│ output         │    320 │
+│ cache_read     │      0 │
+│ cache_creation │      0 │
+│ reasoning      │      0 │
+└────────────────┴────────┘
+No findings yet — detectors land in Phase 1.
+pricing: 2026-07-18-verified
