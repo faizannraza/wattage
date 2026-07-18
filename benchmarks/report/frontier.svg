@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="360" viewBox="0 0 560 360" font-family="ui-monospace, monospace" font-size="11">
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#898781"/></marker></defs>
+<rect width="560" height="360" fill="#fcfcfb"/>
+<line x1="70" y1="50" x2="70" y2="310" stroke="#c3c2b7"/>
+<line x1="70" y1="310" x2="530" y2="310" stroke="#c3c2b7"/>
+<text x="14" y="180" fill="#52514e" transform="rotate(-90 14 180)" text-anchor="middle">task quality</text>
+<text x="300" y="346" fill="#52514e" text-anchor="middle">cost per run ($)</text>
+<line x1="66" y1="310.0" x2="70" y2="310.0" stroke="#c3c2b7"/>
+<text x="62" y="313.0" fill="#898781" text-anchor="end">0.0</text>
+<line x1="66" y1="180.0" x2="70" y2="180.0" stroke="#c3c2b7"/>
+<text x="62" y="183.0" fill="#898781" text-anchor="end">0.5</text>
+<line x1="66" y1="50.0" x2="70" y2="50.0" stroke="#c3c2b7"/>
+<text x="62" y="53.0" fill="#898781" text-anchor="end">1.0</text>
+<text x="70.0" y="326" fill="#898781" text-anchor="middle">$0.0000</text>
+<text x="530.0" y="326" fill="#898781" text-anchor="middle">$0.0002</text>
+<line x1="470.0" y1="50.0" x2="291.1" y2="50.0" stroke="#898781" stroke-width="1.5" marker-end="url(#arrow)"/>
+<circle cx="470.0" cy="50.0" r="5" fill="#e34948"/>
+<circle cx="291.1" cy="50.0" r="5" fill="#008300"/>
+<text x="70.0" y="20.0" fill="#0b0b0b">prefix_churn: $0.0002 → $0.0001</text>
+<circle cx="444" cy="14" r="4" fill="#e34948"/>
+<text x="454" y="18" fill="#52514e" font-size="10">before</text>
+<circle cx="504" cy="14" r="4" fill="#008300"/>
+<text x="514" y="18" fill="#52514e" font-size="10">after</text>
+</svg>

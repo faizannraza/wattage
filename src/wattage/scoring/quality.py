@@ -1,11 +1,11 @@
 """Quality gating (doc §6.3).
 
-Real quality_factor computation from a user-supplied --quality quality.json
-(per-task/step eval scores) lands in Phase 3 alongside model_mismatch and
-reasoning_overspend, the two detectors whose findings actually need it. For
-now this always reports the honest "unmeasured" default — quality_factor=1,
-quality_measured=False — rather than pretending to gate on quality it
-hasn't actually looked at.
+quality_factor down-weights the Token Efficiency score when a supplied
+--quality quality.json shows the run's actual task eval scores falling
+below a target — so a cheap-but-wrong agent can't score well.
+quality_measured is only True when real eval scores were actually found in
+the supplied map; a missing or empty map honestly reports "unmeasured"
+rather than a fabricated confident 1.0.
 """
 
 from __future__ import annotations
@@ -13,7 +13,34 @@ from __future__ import annotations
 from typing import Any
 
 
-def compute_quality_factor(quality_map: dict[str, Any] | None) -> tuple[float, bool]:
-    # `quality_map` is accepted now so call sites don't change in Phase 3,
-    # but it's intentionally ignored until then.
-    return 1.0, False
+def compute_quality_factor(
+    quality_map: dict[str, Any] | None, target: float = 0.90
+) -> tuple[float, bool]:
+    if not quality_map:
+        return 1.0, False
+
+    tasks = quality_map.get("tasks", {})
+    scores = [
+        t["eval_score"] for t in tasks.values() if isinstance(t, dict) and "eval_score" in t
+    ]
+    if not scores:
+        return 1.0, False
+
+    average_quality = sum(scores) / len(scores)
+    factor = min(1.0, average_quality / target) if target > 0 else 1.0
+    return max(0.0, factor), True
+
+
+def downgrade_pass_rate(
+    quality_map: dict[str, Any] | None, step_role: str, candidate_model: str
+) -> float | None:
+    """quality_map["downgrade_evals"]["{step_role}@{candidate_model}"]["pass_rate"]
+    (doc Appendix C shape). None if absent — callers must not guess a rate."""
+    if not quality_map:
+        return None
+    downgrade_evals = quality_map.get("downgrade_evals", {})
+    entry = downgrade_evals.get(f"{step_role}@{candidate_model}")
+    if not isinstance(entry, dict):
+        return None
+    pass_rate = entry.get("pass_rate")
+    return float(pass_rate) if isinstance(pass_rate, int | float) else None

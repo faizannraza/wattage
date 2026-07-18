@@ -18,8 +18,25 @@ yet. Left as a documented future enhancement rather than faked here.
 from __future__ import annotations
 
 from wattage.detectors.base import AnalysisContext, ordered_llm_calls
-from wattage.models import Finding, QualityRisk, Session, Severity
+from wattage.models import Finding, LLMCall, QualityRisk, Session, Severity, Task
 from wattage.pricing.registry import UnknownModelError
+
+
+def find_resent_segments(task: Task) -> list[tuple[LLMCall, int]]:
+    """(call, resent_tokens) pairs where `call` almost certainly re-sent the
+    entire prior call's context uncached — the pure detection logic, reused
+    by this detector and by benchmarks/frontier.py's real-data caching-fix
+    simulation so both share one implementation."""
+    calls = ordered_llm_calls(task)
+    segments: list[tuple[LLMCall, int]] = []
+    for prev, curr in zip(calls, calls[1:], strict=False):
+        if curr.usage.cache_read > 0:
+            continue  # caching is active for this turn; not churn
+        prior_total = prev.usage.input + prev.usage.output
+        if prior_total <= 0 or curr.usage.input < prior_total:
+            continue  # prefix shrank or changed; not a simple resend
+        segments.append((curr, prior_total))
+    return segments
 
 
 class PrefixChurnDetector:
@@ -31,33 +48,26 @@ class PrefixChurnDetector:
         findings: list[Finding] = []
 
         for task in session.tasks:
-            calls = ordered_llm_calls(task)
-            if len(calls) < 2:
+            segments = find_resent_segments(task)
+            if not segments:
                 continue
 
             resent_tokens = 0
             resent_dollars = 0.0
             span_ids: list[str] = []
-
-            for prev, curr in zip(calls, calls[1:], strict=False):
-                if curr.usage.cache_read > 0:
-                    continue  # caching is active for this turn; not churn
-                prior_total = prev.usage.input + prev.usage.output
-                if prior_total <= 0 or curr.usage.input < prior_total:
-                    continue  # prefix shrank or changed; not a simple resend
-
+            for call, tokens in segments:
                 try:
-                    price = ctx.pricing.registry.get(curr.provider, curr.model)
+                    price = ctx.pricing.registry.get(call.provider, call.model)
                 except UnknownModelError:
                     continue
-
-                resent_tokens += prior_total
-                resent_dollars += prior_total * price.input
-                span_ids.append(curr.span_id)
+                resent_tokens += tokens
+                resent_dollars += tokens * price.input
+                span_ids.append(call.span_id)
 
             if resent_tokens == 0:
                 continue
 
+            calls = ordered_llm_calls(task)
             task_dollars = sum(c.cost.total for c in calls)
             ratio = resent_dollars / task_dollars if task_dollars > 0 else 0.0
             severity = Severity.high if ratio >= cfg.high_severity_ratio else Severity.medium

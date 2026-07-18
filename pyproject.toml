@@ -53,6 +53,8 @@ verbosity = "wattage.detectors.verbosity:VerbosityDetector"
 redundant_tool_calls = "wattage.detectors.redundant_tool_calls:RedundantToolCallsDetector"
 nonconvergence = "wattage.detectors.convergence:NonConvergenceDetector"
 retrieval_thrash = "wattage.detectors.retrieval_thrash:RetrievalThrashDetector"
+model_mismatch = "wattage.detectors.model_mismatch:ModelMismatchDetector"
+reasoning_overspend = "wattage.detectors.reasoning_overspend:ReasoningOverspendDetector"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/wattage"]
@@ -63,6 +65,12 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# This file's content is mostly a large embedded HTML/CSS/JS template
+# literal, not Python logic — wrapping it to 100 cols would fragment CSS
+# rules for no benefit.
+"src/wattage/render/html/__init__.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.10"

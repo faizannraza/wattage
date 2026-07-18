@@ -1,6 +1,4 @@
-"""wattage.yaml config schema (doc §9.6). model_mismatch/reasoning_overspend
-sections land alongside their detectors in Phase 3.
-"""
+"""wattage.yaml config schema (doc §9.6)."""
 
 from __future__ import annotations
 
@@ -72,6 +70,29 @@ class RetrievalThrashConfig(BaseModel):
     max_iterations_soft: int = 4
 
 
+class ModelMismatchConfig(BaseModel):
+    enabled: bool = True
+    # provider -> candidate model id, defaulting to the vendored registry's
+    # cheapest known model per provider (doc §9.6's "[haiku-class]").
+    downgrade_candidates: dict[str, str] = Field(
+        default_factory=lambda: {"anthropic": "claude-haiku-4-5", "openai": "gpt-5.6-luna"}
+    )
+    # A call looks like a plain tool-selection step (candidate for downgrade)
+    # when its own output is this small or smaller.
+    simple_output_ceiling: int = 150
+    # doc's own default: never recommend a downgrade without evidence. With
+    # this on, the detector produces nothing at all unless a --quality map's
+    # downgrade_evals confirms the candidate model passes.
+    require_quality_map: bool = True
+    min_downgrade_pass_rate: float = 0.90
+
+
+class ReasoningOverspendConfig(BaseModel):
+    enabled: bool = True
+    expected_reasoning_ceiling: int = 500
+    simple_output_ceiling: int = 150
+
+
 class DetectorsConfig(BaseModel):
     prefix_churn: PrefixChurnConfig = Field(default_factory=PrefixChurnConfig)
     cache_gap: CacheGapConfig = Field(default_factory=CacheGapConfig)
@@ -81,7 +102,16 @@ class DetectorsConfig(BaseModel):
     )
     nonconvergence: NonConvergenceConfig = Field(default_factory=NonConvergenceConfig)
     retrieval_thrash: RetrievalThrashConfig = Field(default_factory=RetrievalThrashConfig)
+    model_mismatch: ModelMismatchConfig = Field(default_factory=ModelMismatchConfig)
+    reasoning_overspend: ReasoningOverspendConfig = Field(
+        default_factory=ReasoningOverspendConfig
+    )
+
+
+class QualityConfig(BaseModel):
+    target: float = 0.90
 
 
 class WattageConfig(BaseModel):
     detectors: DetectorsConfig = Field(default_factory=DetectorsConfig)
+    quality: QualityConfig = Field(default_factory=QualityConfig)

@@ -62,13 +62,16 @@ def test_report_json_flag_emits_valid_matching_json() -> None:
     assert payload["token_breakdown"]["input"] == 18450
 
 
-def test_report_html_flag_errors_cleanly_as_not_yet_implemented() -> None:
+def test_report_html_flag_writes_a_self_contained_flame_graph(tmp_path: Path) -> None:
+    out_path = tmp_path / "out.html"
     result = runner.invoke(
         app,
-        ["report", str(REPO_ROOT / "examples" / "sample_trace.json"), "--html", "out.html"],
+        ["report", str(REPO_ROOT / "examples" / "sample_trace.json"), "--html", str(out_path)],
     )
-    assert result.exit_code != 0
-    assert "Phase 3" in result.output
+    assert result.exit_code == 0
+    html = out_path.read_text(encoding="utf-8")
+    assert html.startswith("<!DOCTYPE html>")
+    assert "<svg" in html
 
 
 def test_score_command_prints_grade_and_headline() -> None:
@@ -76,3 +79,39 @@ def test_score_command_prints_grade_and_headline() -> None:
     assert result.exit_code == 0
     assert "A (100)" in result.stdout
     assert "recoverable" in result.stdout
+
+
+def test_quality_flag_wires_a_real_quality_factor(tmp_path: Path) -> None:
+    quality_file = tmp_path / "quality.json"
+    quality_file.write_text(json.dumps({"tasks": {"t1": {"eval_score": 0.45}}}))
+
+    without_quality = build_report(str(REPO_ROOT / "examples" / "sample_trace.json"))
+    assert without_quality.score.quality_measured is False
+
+    with_quality = build_report(
+        str(REPO_ROOT / "examples" / "sample_trace.json"), quality_file=str(quality_file)
+    )
+    assert with_quality.score.quality_measured is True
+    assert with_quality.score.quality_factor < 1.0
+
+
+def test_badge_command_prints_svg_to_stdout() -> None:
+    result = runner.invoke(app, ["badge", str(REPO_ROOT / "examples" / "sample_trace.json")])
+    assert result.exit_code == 0
+    assert result.stdout.startswith('<?xml version="1.0" encoding="UTF-8"?>')
+    assert "<svg" in result.stdout
+
+
+def test_badge_command_writes_to_file(tmp_path: Path) -> None:
+    out_path = tmp_path / "badge.svg"
+    result = runner.invoke(
+        app,
+        [
+            "badge",
+            str(REPO_ROOT / "examples" / "sample_trace.json"),
+            "--out",
+            str(out_path),
+        ],
+    )
+    assert result.exit_code == 0
+    assert out_path.read_text(encoding="utf-8").startswith('<?xml version="1.0"')
