@@ -78,3 +78,77 @@ def test_multiple_trace_ids_become_separate_sessions() -> None:
     spans = [_chat("c1", None, "trace-1", 0), _chat("c2", None, "trace-2", 0)]
     trace = sessionize(spans, source="synthetic")
     assert {s.session_id for s in trace.sessions} == {"trace-1", "trace-2"}
+
+
+def _agent(span_id: str, parent_id: str | None, trace_id: str, start: int, end: int) -> RawSpan:
+    return RawSpan(
+        span_id=span_id,
+        parent_span_id=parent_id,
+        trace_id=trace_id,
+        name="invoke_agent",
+        kind=SpanKind.invoke_agent,
+        start_ns=start,
+        end_ns=end,
+    )
+
+
+def test_loop_ending_in_chat_only_iteration_is_inferred_as_reached_success() -> None:
+    agent = _agent("agent-1", None, "trace-A", 0, 100)
+    spans = [
+        agent,
+        _chat("chat-1", "agent-1", "trace-A", 1),
+        _tool("tool-1", "agent-1", "trace-A", 10),
+        _chat("chat-2", "agent-1", "trace-A", 15),
+    ]
+    trace = sessionize(spans, source="synthetic")
+    loop = trace.sessions[0].tasks[0].loops[0]
+    assert loop.reached_success is True
+
+
+def test_loop_ending_mid_tool_call_is_not_inferred_as_reached_success() -> None:
+    agent = _agent("agent-1", None, "trace-A", 0, 100)
+    spans = [
+        agent,
+        _chat("chat-1", "agent-1", "trace-A", 1),
+        _tool("tool-1", "agent-1", "trace-A", 10),
+        _chat("chat-2", "agent-1", "trace-A", 15),
+        _tool("tool-2", "agent-1", "trace-A", 20),
+    ]
+    trace = sessionize(spans, source="synthetic")
+    loop = trace.sessions[0].tasks[0].loops[0]
+    assert loop.reached_success is False
+
+
+def test_nested_agent_span_becomes_its_own_task() -> None:
+    outer = _agent("outer-agent", None, "trace-A", 0, 100)
+    inner = _agent("inner-agent", "outer-agent", "trace-A", 10, 50)
+    spans = [
+        outer,
+        _chat("outer-chat", "outer-agent", "trace-A", 1),
+        inner,
+        _chat("inner-chat", "inner-agent", "trace-A", 11),
+    ]
+    trace = sessionize(spans, source="synthetic")
+
+    tasks = trace.sessions[0].tasks
+    assert len(tasks) == 2
+    # Each task claims only its own agent's direct call, not the nested one's.
+    all_llm_span_ids = {c.span_id for t in tasks for c in t.llm_calls}
+    assert all_llm_span_ids == {"outer-chat", "inner-chat"}
+    outer_task = next(t for t in tasks if any(c.span_id == "outer-chat" for c in t.llm_calls))
+    assert all(c.span_id != "inner-chat" for c in outer_task.llm_calls)
+
+
+def test_orphan_calls_outside_any_agent_span_get_a_catch_all_task() -> None:
+    agent = _agent("agent-1", None, "trace-A", 0, 100)
+    spans = [
+        agent,
+        _chat("agent-chat", "agent-1", "trace-A", 1),
+        _chat("orphan-chat", None, "trace-A", 200),  # sibling of the agent span, not under it
+    ]
+    trace = sessionize(spans, source="synthetic")
+
+    tasks = trace.sessions[0].tasks
+    assert len(tasks) == 2
+    all_llm_span_ids = {c.span_id for t in tasks for c in t.llm_calls}
+    assert all_llm_span_ids == {"agent-chat", "orphan-chat"}

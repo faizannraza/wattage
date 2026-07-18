@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 
 from wattage.adapters.otlp_file import OTLPFileAdapter
 from wattage.config import WattageConfig
+from wattage.convergence.embed import build_embedder
 from wattage.detectors.base import AnalysisContext, load_detectors, ordered_llm_calls
 from wattage.models import Report
 from wattage.pricing.engine import PricingEngine
@@ -51,7 +52,10 @@ def build_report(
                 token_breakdown["reasoning"] += call.usage.reasoning
                 total_dollars += call.cost.total
 
-    ctx = AnalysisContext(pricing=engine, config=config)
+    # Built once and shared: retrieval_thrash (Phase 2.10) reuses the same
+    # embedder instance rather than each detector loading its own model.
+    embedder = build_embedder(config.detectors.nonconvergence.embed)
+    ctx = AnalysisContext(pricing=engine, config=config, embedder=embedder)
     detectors = load_detectors(config)
     findings = [
         finding
