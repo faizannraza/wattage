@@ -1,8 +1,7 @@
 """Terminal renderer (doc §7.7): compact rich summary.
 
-Phase 0 shows cost + token breakdown only — no detectors have run yet, so the
-score is a placeholder (quality/waste are honestly reported as unmeasured,
-never guessed at). Findings and a real score land in Phase 1.
+Quality is honestly reported as unmeasured until a --quality map is supplied
+(Phase 3) rather than guessed at.
 """
 
 from __future__ import annotations
@@ -42,6 +41,6 @@ def render_terminal(report: Report, console: Console | None = None) -> None:
             findings_table.add_row(f.id, f.severity.value, f"${f.wasted_dollars:.4f}", f.fix)
         console.print(findings_table)
     else:
-        console.print("[dim]No findings yet — detectors land in Phase 1.[/dim]")
+        console.print("[dim]No findings — this trace looks efficient.[/dim]")
 
     console.print(f"[dim]pricing: {report.pricing_version}[/dim]")

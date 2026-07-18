@@ -8,6 +8,7 @@
 # Source: https://platform.claude.com/docs/en/about-claude/pricing (fetched 2026-07-18)
 #         https://platform.claude.com/docs/en/build-with-claude/prompt-caching (fetched 2026-07-18)
 #         https://developers.openai.com/api/docs/pricing (fetched 2026-07-18)
+#         https://mistral.ai/pricing/api (fetched 2026-07-18)
 #
 # Known simplification: providers report a single `cache_creation` token count
 # with no TTL breakdown in the gen_ai.* usage attributes, but Anthropic prices
@@ -73,3 +74,13 @@ providers:
       cache_read_mult: 0.10
       cache_write_mult: 1.0
       min_cacheable_prefix_tokens: 1024
+
+  mistral:
+    # Mistral's caching economics aren't verified here (no cache_read_mult /
+    # cache_write_mult given), so they default to 1.0 (no assumed discount or
+    # premium) rather than guessing — this provider was added specifically
+    # because a real validation trace (any-agent, see benchmarks/traces/)
+    # used it and had no vendored entry.
+    mistral-small-latest:
+      input: 0.15e-6
+      output: 0.6e-6

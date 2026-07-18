@@ -1,4 +1,5 @@
 import io
+import json
 from pathlib import Path
 
 from rich.console import Console
@@ -49,3 +50,29 @@ def test_report_prices_example_fixture_correctly() -> None:
     }
     expected_total = 18450 * 3.0e-6 + 320 * 15.0e-6
     assert abs(report.total_dollars - expected_total) < 1e-9
+
+
+def test_report_json_flag_emits_valid_matching_json() -> None:
+    result = runner.invoke(
+        app, ["report", str(REPO_ROOT / "examples" / "sample_trace.json"), "--json"]
+    )
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["score"]["grade"] == "A"
+    assert payload["token_breakdown"]["input"] == 18450
+
+
+def test_report_html_flag_errors_cleanly_as_not_yet_implemented() -> None:
+    result = runner.invoke(
+        app,
+        ["report", str(REPO_ROOT / "examples" / "sample_trace.json"), "--html", "out.html"],
+    )
+    assert result.exit_code != 0
+    assert "Phase 3" in result.output
+
+
+def test_score_command_prints_grade_and_headline() -> None:
+    result = runner.invoke(app, ["score", str(REPO_ROOT / "examples" / "sample_trace.json")])
+    assert result.exit_code == 0
+    assert "A (100)" in result.stdout
+    assert "recoverable" in result.stdout

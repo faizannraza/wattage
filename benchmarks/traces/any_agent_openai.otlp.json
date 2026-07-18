@@ -1,0 +1,324 @@
+{
+  "resourceSpans": [
+    {
+      "scopeSpans": [
+        {
+          "spans": [
+            {
+              "traceId": "100927429609276267646756448943279827607",
+              "spanId": "9295669169508793927",
+              "parentSpanId": "12324293800750531911",
+              "name": "call_llm mistral/mistral-small-latest",
+              "startTimeUnixNano": "1758026593210770000",
+              "endTimeUnixNano": "1758026593449611000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "call_llm"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "mistral/mistral-small-latest"
+                  }
+                },
+                {
+                  "key": "gen_ai.input.messages",
+                  "value": {
+                    "stringValue": "[{\"role\": \"system\", \"content\": \"Use the available tools to answer.\"}, {\"content\": \"Find what year it is in the America/New_York timezone and write the value (single number) to a file. Finally, return a list of the steps you have taken.\", \"role\": \"user\"}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.output",
+                  "value": {
+                    "stringValue": "[{\"tool.name\": \"get_current_time\", \"tool.args\": \"{\\\"timezone\\\": \\\"America/New_York\\\"}\"}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.type",
+                  "value": {
+                    "stringValue": "json"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "269"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "16"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_cost",
+                  "value": {
+                    "doubleValue": 2.69e-05
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_cost",
+                  "value": {
+                    "doubleValue": 4.8e-06
+                  }
+                }
+              ]
+            },
+            {
+              "traceId": "100927429609276267646756448943279827607",
+              "spanId": "13687147528289423029",
+              "parentSpanId": "12324293800750531911",
+              "name": "execute_tool get_current_time",
+              "startTimeUnixNano": "1758026593450406000",
+              "endTimeUnixNano": "1758026593452926000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "get_current_time"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.description",
+                  "value": {
+                    "stringValue": "Get current time in a specific timezones"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.args",
+                  "value": {
+                    "stringValue": "{\"timezone\": \"America/New_York\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.output",
+                  "value": {
+                    "stringValue": "{\n  \"timezone\": \"America/New_York\",\n  \"datetime\": \"2025-09-16T08:43:13-04:00\",\n  \"is_dst\": true\n}"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.type",
+                  "value": {
+                    "stringValue": "json"
+                  }
+                }
+              ]
+            },
+            {
+              "traceId": "100927429609276267646756448943279827607",
+              "spanId": "1954108595464389762",
+              "parentSpanId": "12324293800750531911",
+              "name": "call_llm mistral/mistral-small-latest",
+              "startTimeUnixNano": "1758026593453682000",
+              "endTimeUnixNano": "1758026593767325000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "call_llm"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "mistral/mistral-small-latest"
+                  }
+                },
+                {
+                  "key": "gen_ai.output",
+                  "value": {
+                    "stringValue": "[{\"tool.name\": \"write_file\", \"tool.args\": \"{\\\"text\\\": \\\"2025\\\"}\"}]"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.type",
+                  "value": {
+                    "stringValue": "json"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "359"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "14"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_cost",
+                  "value": {
+                    "doubleValue": 3.59e-05
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_cost",
+                  "value": {
+                    "doubleValue": 4.2e-06
+                  }
+                }
+              ]
+            },
+            {
+              "traceId": "100927429609276267646756448943279827607",
+              "spanId": "3402142098134531952",
+              "parentSpanId": "12324293800750531911",
+              "name": "execute_tool write_file",
+              "startTimeUnixNano": "1758026593769194000",
+              "endTimeUnixNano": "1758026593771373000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "write_file"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.description",
+                  "value": {
+                    "stringValue": "write the text to a file in the tmp_path directory"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.args",
+                  "value": {
+                    "stringValue": "{\"text\": \"2025\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.output",
+                  "value": {
+                    "stringValue": "{}"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.type",
+                  "value": {
+                    "stringValue": "json"
+                  }
+                }
+              ]
+            },
+            {
+              "traceId": "100927429609276267646756448943279827607",
+              "spanId": "10907162358052518539",
+              "parentSpanId": "12324293800750531911",
+              "name": "call_llm mistral/mistral-small-latest",
+              "startTimeUnixNano": "1758026593773377000",
+              "endTimeUnixNano": "1758026594435103000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "call_llm"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "mistral/mistral-small-latest"
+                  }
+                },
+                {
+                  "key": "gen_ai.output",
+                  "value": {
+                    "stringValue": "{\"steps\": [{\"number\": 1, \"description\": \"Get current time in the America/New_York timezone.\"}, {\"number\": 2, \"description\": \"Write the year to a file.\"}]}"
+                  }
+                },
+                {
+                  "key": "gen_ai.output.type",
+                  "value": {
+                    "stringValue": "json"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "392"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "46"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_cost",
+                  "value": {
+                    "doubleValue": 3.92e-05
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_cost",
+                  "value": {
+                    "doubleValue": 1.38e-05
+                  }
+                }
+              ]
+            },
+            {
+              "traceId": "100927429609276267646756448943279827607",
+              "spanId": "12324293800750531911",
+              "parentSpanId": "",
+              "name": "invoke_agent [any_agent]",
+              "startTimeUnixNano": "1758026593209236000",
+              "endTimeUnixNano": "1758026594436486000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "any_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.description",
+                  "value": {
+                    "stringValue": "No description."
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "mistral/mistral-small-latest"
+                  }
+                },
+                {
+                  "key": "any_agent.version",
+                  "value": {
+                    "stringValue": "1.9.1.dev0+g8e34f9a88.d20250915"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

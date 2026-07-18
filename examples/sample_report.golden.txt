@@ -12,5 +12,5 @@
 │ cache_creation │      0 │
 │ reasoning      │      0 │
 └────────────────┴────────┘
-No findings yet — detectors land in Phase 1.
+No findings — this trace looks efficient.
 pricing: 2026-07-18-verified

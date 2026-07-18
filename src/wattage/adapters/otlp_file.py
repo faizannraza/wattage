@@ -21,6 +21,11 @@ _LEGACY_MODEL_KEYS = ("llm.model", "openai.model")
 
 _KIND_BY_OPERATION = {
     "chat": SpanKind.chat,
+    # "call_llm" isn't a canonical semconv operation name, but it's what
+    # mozilla-ai/any-agent (a real, actively maintained multi-framework
+    # instrumentation) actually emits — found via real-trace validation, not
+    # speculatively added.
+    "call_llm": SpanKind.chat,
     "execute_tool": SpanKind.execute_tool,
     "invoke_agent": SpanKind.invoke_agent,
     "create_agent": SpanKind.create_agent,

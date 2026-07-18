@@ -47,6 +47,10 @@ Repository = "https://github.com/muhammadfaizanraza/wattage"
 wattage = "wattage.cli:app"
 
 [project.entry-points."wattage.detectors"]
+prefix_churn = "wattage.detectors.prefix_churn:PrefixChurnDetector"
+cache_gap = "wattage.detectors.cache_gap:CacheGapDetector"
+verbosity = "wattage.detectors.verbosity:VerbosityDetector"
+redundant_tool_calls = "wattage.detectors.redundant_tool_calls:RedundantToolCallsDetector"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/wattage"]
@@ -64,6 +68,16 @@ packages = ["wattage"]
 mypy_path = "src"
 strict = true
 disallow_untyped_defs = true
+
+# numpy's bundled stubs use PEP 695 syntax (3.12+), newer than our python_version
+# target; we don't use numpy yet (reserved for Phase 2's convergence math), so skip
+# following it rather than lowering our own code's target-version bar.
+[[tool.mypy.overrides]]
+module = "numpy.*"
+follow_imports = "skip"
+follow_imports_for_stubs = true
+ignore_errors = true
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
