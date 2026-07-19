@@ -44,8 +44,8 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/muhammadfaizanraza/wattage"
-Repository = "https://github.com/muhammadfaizanraza/wattage"
+Homepage = "https://github.com/faizannraza/wattage"
+Repository = "https://github.com/faizannraza/wattage"
 
 [project.scripts]
 wattage = "wattage.cli:app"

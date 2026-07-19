@@ -23,7 +23,7 @@ trace export and it prices every call and runs every detector. Try it right
 now against the fixture shipped in this repo:
 
 ```bash
-git clone https://github.com/muhammadfaizanraza/wattage
+git clone https://github.com/faizannraza/wattage
 cd wattage && uv sync
 uv run wattage report examples/sample_trace.json
 ```
@@ -161,7 +161,7 @@ jobs:
       - name: Generate trace fixture
         run: python scripts/run_agent_fixture.py > trace.json
       - name: Wattage cost-regression gate
-        uses: muhammadfaizanraza/wattage/action@v1
+        uses: faizannraza/wattage/action@main
         with:
           source: trace.json
           baseline: .wattage/baseline.json
@@ -174,7 +174,14 @@ you set, posts a per-detector delta table as a PR comment, and emits SARIF
 (shows up in GitHub's Security tab) and JUnit XML for any other CI system.
 The baseline is a small committed JSON file — noise-floor protection is
 structural, not statistical: it only ever updates on a run that actually
-passed the gate. Full reference: [CI Integration](docs/ci.md).
+passed the gate.
+
+**This is only half the setup.** A PR job runs on a throwaway checkout, so
+it can't be the thing that updates `.wattage/baseline.json` on disk — that
+update needs a second workflow, triggered on push to your default branch,
+that commits the refreshed baseline (and badge) back after each merge.
+Skipping it means every PR compares against the same stale baseline
+forever. Full reference, with both workflows: [CI Integration](docs/ci.md).
 
 ## Contributing
 

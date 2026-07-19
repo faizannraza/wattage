@@ -63,7 +63,7 @@ def render_sarif(report: Report, tool_version: str = "0.1.0") -> str:
                     "driver": {
                         "name": "wattage",
                         "version": tool_version,
-                        "informationUri": "https://github.com/muhammadfaizanraza/wattage",
+                        "informationUri": "https://github.com/faizannraza/wattage",
                         "rules": rules,
                     }
                 },

@@ -1,7 +1,7 @@
 site_name: Wattage
 site_description: A token-spend profiler and cost-regression gate for AI agents.
 site_url: https://wattage.readthedocs.io/
-repo_url: https://github.com/muhammadfaizanraza/wattage
+repo_url: https://github.com/faizannraza/wattage
 repo_name: wattage
 edit_uri: edit/main/docs/
 

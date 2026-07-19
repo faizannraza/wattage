@@ -6,7 +6,7 @@ detail, how to add a new detector — the most common contribution.
 ## Dev setup
 
 ```bash
-git clone https://github.com/muhammadfaizanraza/wattage
+git clone https://github.com/faizannraza/wattage
 cd wattage
 uv sync --extra dev --extra docs
 ```
