@@ -38,9 +38,7 @@ def _is_retrieval_like(tool_call: ToolCall) -> bool:
 
 
 def _is_retrieval_iteration(iteration: Iteration) -> bool:
-    return bool(iteration.retrievals) or any(
-        _is_retrieval_like(tc) for tc in iteration.tool_calls
-    )
+    return bool(iteration.retrievals) or any(_is_retrieval_like(tc) for tc in iteration.tool_calls)
 
 
 def _retrieval_info(iteration: Iteration) -> str:
@@ -118,9 +116,7 @@ class RetrievalThrashDetector:
             return None
 
         severity = (
-            Severity.high
-            if len(low_yield_iterations) >= len(retrieval_iters)
-            else Severity.medium
+            Severity.high if len(low_yield_iterations) >= len(retrieval_iters) else Severity.medium
         )
         return Finding(
             id=self.id,

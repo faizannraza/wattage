@@ -16,9 +16,7 @@ import pytest
 
 from wattage.report import build_report
 
-TRACE_PATH = (
-    Path(__file__).parent.parent / "benchmarks" / "traces" / "any_agent_openai.otlp.json"
-)
+TRACE_PATH = Path(__file__).parent.parent / "benchmarks" / "traces" / "any_agent_openai.otlp.json"
 
 
 def test_real_trace_prices_correctly_and_finds_exactly_the_expected_waste() -> None:

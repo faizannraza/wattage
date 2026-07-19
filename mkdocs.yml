@@ -1,0 +1,50 @@
+site_name: Wattage
+site_description: A token-spend profiler and cost-regression gate for AI agents.
+site_url: https://wattage.readthedocs.io/
+repo_url: https://github.com/muhammadfaizanraza/wattage
+repo_name: wattage
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: amber
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: amber
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Adapters: adapters.md
+  - Detectors:
+      - Overview: detectors/index.md
+      - prefix_churn: detectors/prefix_churn.md
+      - cache_gap: detectors/cache_gap.md
+      - verbosity: detectors/verbosity.md
+      - redundant_tool_calls: detectors/redundant_tool_calls.md
+      - retrieval_thrash: detectors/retrieval_thrash.md
+      - model_mismatch: detectors/model_mismatch.md
+      - reasoning_overspend: detectors/reasoning_overspend.md
+  - The Convergence Engine: convergence.md
+  - CI Integration: ci.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - tables

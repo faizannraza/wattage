@@ -65,6 +65,7 @@ def build_trace_and_report(
         "reasoning": 0,
     }
     total_dollars = 0.0
+    unpriced_calls = 0
 
     # Price every call first: detectors (cache_gap, prefix_churn's ratio-based
     # severity) read call.cost, so pricing must happen before detection runs.
@@ -78,13 +79,13 @@ def build_trace_and_report(
                 token_breakdown["cache_creation"] += call.usage.cache_creation
                 token_breakdown["reasoning"] += call.usage.reasoning
                 total_dollars += call.cost.total
+                if call.cost.unpriced:
+                    unpriced_calls += 1
 
     # Built once and shared: retrieval_thrash (Phase 2.10) reuses the same
     # embedder instance rather than each detector loading its own model.
     embedder = build_embedder(config.detectors.nonconvergence.embed)
-    ctx = AnalysisContext(
-        pricing=engine, config=config, embedder=embedder, quality_map=quality_map
-    )
+    ctx = AnalysisContext(pricing=engine, config=config, embedder=embedder, quality_map=quality_map)
     detectors = load_detectors(config)
     findings = [
         finding
@@ -111,5 +112,6 @@ def build_trace_and_report(
         score=score,
         pricing_version=registry.version,
         generated_at=datetime.now(timezone.utc).isoformat(),
+        unpriced_calls=unpriced_calls,
     )
     return trace, report

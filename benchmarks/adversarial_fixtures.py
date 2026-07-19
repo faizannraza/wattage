@@ -42,9 +42,7 @@ def _llm(span_id: str, input_tok: int, output_tok: int = 50) -> LLMCall:
 
 
 def _tool(span_id: str, name: str, args: dict[str, object], result: str) -> ToolCall:
-    return ToolCall(
-        span_id=span_id, name=name, args=args, args_hash="x", result=result, start_ns=0
-    )
+    return ToolCall(span_id=span_id, name=name, args=args, args_hash="x", result=result, start_ns=0)
 
 
 def _iter(
@@ -78,11 +76,17 @@ FIXTURES.append(
             "linear_research",
             [
                 _iter(
-                    0, 500, "search_docs", {"q": "refund policy"},
+                    0,
+                    500,
+                    "search_docs",
+                    {"q": "refund policy"},
                     "Refund policy: full refund within 30 days if the item is unused.",
                 ),
                 _iter(
-                    1, 700, "search_docs", {"q": "shipping policy"},
+                    1,
+                    700,
+                    "search_docs",
+                    {"q": "shipping policy"},
                     "Shipping policy: orders ship within 2 business days via standard carrier.",
                 ),
                 _iter(2, 900),  # final answer, chat only, no further tool call
@@ -100,15 +104,24 @@ FIXTURES.append(
             "multi_tool_pipeline",
             [
                 _iter(
-                    0, 400, "list_files", {"dir": "/repo/src"},
+                    0,
+                    400,
+                    "list_files",
+                    {"dir": "/repo/src"},
                     "Found 12 files: main.py, utils.py, config.py, ...",
                 ),
                 _iter(
-                    1, 600, "read_file", {"path": "/repo/src/config.py"},
+                    1,
+                    600,
+                    "read_file",
+                    {"path": "/repo/src/config.py"},
                     "DATABASE_URL = os.environ['DATABASE_URL']\nDEBUG = False",
                 ),
                 _iter(
-                    2, 800, "grep", {"pattern": "DATABASE_URL", "dir": "/repo"},
+                    2,
+                    800,
+                    "grep",
+                    {"pattern": "DATABASE_URL", "dir": "/repo"},
                     "src/config.py:1\nsrc/db.py:15\ntests/test_db.py:8",
                 ),
                 _iter(3, 950),  # final answer
@@ -130,12 +143,18 @@ FIXTURES.append(
             "iterative_narrowing",
             [
                 _iter(
-                    0, 500, "search_web", {"q": "python asyncio deadlock"},
+                    0,
+                    500,
+                    "search_web",
+                    {"q": "python asyncio deadlock"},
                     "Common causes: awaiting a lock already held by the same task, "
                     "blocking calls inside a coroutine.",
                 ),
                 _iter(
-                    1, 750, "search_web", {"q": "asyncio deadlock same task double lock"},
+                    1,
+                    750,
+                    "search_web",
+                    {"q": "asyncio deadlock same task double lock"},
                     "Reentrant lock acquisition in asyncio.Lock is not supported; use "
                     "asyncio.Semaphore or restructure to avoid nested acquisition.",
                 ),
@@ -144,8 +163,7 @@ FIXTURES.append(
         ),
         label="productive",
         note=(
-            "Same tool reused, but each query narrows in and returns materially "
-            "different content."
+            "Same tool reused, but each query narrows in and returns materially different content."
         ),
     )
 )
@@ -194,9 +212,7 @@ FIXTURES.append(
         loop=_loop(
             "rephrased_retry",
             [
-                _iter(
-                    i, 500 + i * 50, "web_search", {"query": query}, "No relevant results found."
-                )
+                _iter(i, 500 + i * 50, "web_search", {"query": query}, "No relevant results found.")
                 for i, query in enumerate(
                     [
                         "how to fix connection refused error",
@@ -313,8 +329,7 @@ FIXTURES.append(
         ),
         label="stalled",
         note=(
-            "Same diagnostic tool, fuzzy probe id, uninformative result, steadily "
-            "growing context."
+            "Same diagnostic tool, fuzzy probe id, uninformative result, steadily growing context."
         ),
     )
 )

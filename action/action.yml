@@ -1,0 +1,67 @@
+name: "Wattage Cost Regression Gate"
+description: "Fails a PR when a change makes your AI agents more expensive."
+author: "wattage"
+branding:
+  icon: "zap"
+  color: "yellow"
+
+inputs:
+  source:
+    description: "Path to the OTLP JSON trace file to analyze."
+    required: true
+  baseline:
+    description: "Path to the committed baseline JSON."
+    required: false
+    default: ".wattage/baseline.json"
+  pricing:
+    description: "Path to a pricing.yaml override."
+    required: false
+  quality:
+    description: "Path to a quality.json map (enables quality-gated findings)."
+    required: false
+  fail-on:
+    description: 'e.g. "score_below:80,cost_delta_pct_above:5,any_critical:true"'
+    required: false
+  pr-comment:
+    description: 'Post the results as a PR comment when running on a pull_request event ("true"/"false").'
+    required: false
+    default: "true"
+  sarif-out:
+    description: "Path to write SARIF results (upload separately with github/codeql-action/upload-sarif)."
+    required: false
+    default: "wattage.sarif"
+  junit-out:
+    description: "Path to write JUnit XML results."
+    required: false
+  badge-out:
+    description: "Path to write a Token Efficiency SVG badge (e.g. .github/wattage-badge.svg)."
+    required: false
+
+outputs:
+  exit-code:
+    description: "The wattage ci exit code (0 pass, 1 fail, 2 config error, 3 ingestion error, 4 pricing error)."
+    value: ${{ steps.run.outputs.exit-code }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+    - name: Install wattage
+      shell: bash
+      run: uv tool install wattage --quiet
+    - name: Run wattage ci
+      id: run
+      shell: bash
+      run: "${{ github.action_path }}/entrypoint.sh"
+      env:
+        INPUT_SOURCE: ${{ inputs.source }}
+        INPUT_BASELINE: ${{ inputs.baseline }}
+        INPUT_PRICING: ${{ inputs.pricing }}
+        INPUT_QUALITY: ${{ inputs.quality }}
+        INPUT_FAIL_ON: ${{ inputs.fail-on }}
+        INPUT_PR_COMMENT: ${{ inputs.pr-comment }}
+        INPUT_SARIF_OUT: ${{ inputs.sarif-out }}
+        INPUT_JUNIT_OUT: ${{ inputs.junit-out }}
+        INPUT_BADGE_OUT: ${{ inputs.badge-out }}
+        GH_TOKEN: ${{ github.token }}

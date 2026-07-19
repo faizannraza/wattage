@@ -1,0 +1,18 @@
+{
+  "name": "wattage-cli",
+  "version": "0.1.0",
+  "description": "npx shim for wattage, a token-spend profiler and cost-regression gate for AI agents. Shells out to the Python core via uvx/pipx.",
+  "bin": {
+    "wattage": "./bin/wattage.js"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/muhammadfaizanraza/wattage",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/muhammadfaizanraza/wattage"
+  },
+  "keywords": ["llm", "agents", "opentelemetry", "cost", "tokens"],
+  "engines": {
+    "node": ">=16"
+  }
+}

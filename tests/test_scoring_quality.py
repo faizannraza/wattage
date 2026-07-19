@@ -40,6 +40,4 @@ def test_downgrade_pass_rate_found() -> None:
 def test_downgrade_pass_rate_absent_returns_none() -> None:
     assert downgrade_pass_rate(None, "tool_select", "claude-haiku-4-5") is None
     assert downgrade_pass_rate({}, "tool_select", "claude-haiku-4-5") is None
-    assert downgrade_pass_rate(
-        {"downgrade_evals": {}}, "tool_select", "claude-haiku-4-5"
-    ) is None
+    assert downgrade_pass_rate({"downgrade_evals": {}}, "tool_select", "claude-haiku-4-5") is None

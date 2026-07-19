@@ -20,9 +20,7 @@ def compute_quality_factor(
         return 1.0, False
 
     tasks = quality_map.get("tasks", {})
-    scores = [
-        t["eval_score"] for t in tasks.values() if isinstance(t, dict) and "eval_score" in t
-    ]
+    scores = [t["eval_score"] for t in tasks.values() if isinstance(t, dict) and "eval_score" in t]
     if not scores:
         return 1.0, False
 

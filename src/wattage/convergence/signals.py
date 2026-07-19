@@ -92,9 +92,7 @@ def evidence_gain(new_info: str, prior_infos: list[str], embedder: Embedder) -> 
     return embedder.novelty(new_info, prior_infos)
 
 
-def state_delta(
-    curr_action: str, prior_action: str | None, embedder: Embedder
-) -> float:
+def state_delta(curr_action: str, prior_action: str | None, embedder: Embedder) -> float:
     if prior_action is None:
         return 1.0  # nothing to compare against yet; the first iteration always "changes state"
     return embedder.novelty(curr_action, [prior_action])

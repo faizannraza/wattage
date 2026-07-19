@@ -46,9 +46,7 @@ class VerbosityDetector:
                 excess = call.usage.output - cfg.expected_output_ceiling
                 wasted_dollars = excess * price.output
                 high_threshold = cfg.expected_output_ceiling * cfg.high_severity_multiplier
-                severity = (
-                    Severity.high if call.usage.output >= high_threshold else Severity.medium
-                )
+                severity = Severity.high if call.usage.output >= high_threshold else Severity.medium
 
                 findings.append(
                     Finding(

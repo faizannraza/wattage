@@ -5,9 +5,7 @@ from wattage.models import Iteration, LLMCall, Loop, Session, Task, TokenUsage, 
 from wattage.pricing.engine import PricingEngine
 from wattage.pricing.registry import PricingRegistry
 
-_PASSING_QUALITY_MAP = {
-    "downgrade_evals": {"tool_select@claude-haiku-4-5": {"pass_rate": 0.97}}
-}
+_PASSING_QUALITY_MAP = {"downgrade_evals": {"tool_select@claude-haiku-4-5": {"pass_rate": 0.97}}}
 
 
 def _tool_select_session(engine: PricingEngine, model: str = "claude-opus-4-8") -> Session:
@@ -37,9 +35,7 @@ def test_no_finding_without_quality_map_by_default() -> None:
 
 def test_finding_produced_with_confirmed_quality_map() -> None:
     engine = PricingEngine(PricingRegistry.load())
-    ctx = AnalysisContext(
-        pricing=engine, config=WattageConfig(), quality_map=_PASSING_QUALITY_MAP
-    )
+    ctx = AnalysisContext(pricing=engine, config=WattageConfig(), quality_map=_PASSING_QUALITY_MAP)
     findings = ModelMismatchDetector().analyze(_tool_select_session(engine), ctx)
 
     assert len(findings) == 1
@@ -52,9 +48,7 @@ def test_finding_produced_with_confirmed_quality_map() -> None:
 
 def test_low_pass_rate_still_suppresses_the_finding() -> None:
     engine = PricingEngine(PricingRegistry.load())
-    low_confidence_map = {
-        "downgrade_evals": {"tool_select@claude-haiku-4-5": {"pass_rate": 0.5}}
-    }
+    low_confidence_map = {"downgrade_evals": {"tool_select@claude-haiku-4-5": {"pass_rate": 0.5}}}
     ctx = AnalysisContext(pricing=engine, config=WattageConfig(), quality_map=low_confidence_map)
     assert ModelMismatchDetector().analyze(_tool_select_session(engine), ctx) == []
 

@@ -193,3 +193,8 @@ class Report(BaseModel):
     score: Score
     pricing_version: str
     generated_at: str
+    # Count of LLM calls the pricing engine couldn't price (unknown model,
+    # no override) — `total_dollars` is an undercount whenever this is > 0.
+    # Surfaced so CI can fail loudly (doc §11.3 exit code 4) instead of
+    # silently gating on a cost figure known to be incomplete.
+    unpriced_calls: int = 0

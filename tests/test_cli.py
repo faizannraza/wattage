@@ -115,3 +115,78 @@ def test_badge_command_writes_to_file(tmp_path: Path) -> None:
     )
     assert result.exit_code == 0
     assert out_path.read_text(encoding="utf-8").startswith('<?xml version="1.0"')
+
+
+def test_ci_command_exit_code_propagates_through_the_real_cli(tmp_path: Path) -> None:
+    baseline_path = tmp_path / "baseline.json"
+    passing = runner.invoke(
+        app,
+        [
+            "ci",
+            str(REPO_ROOT / "examples" / "sample_trace.json"),
+            "--baseline",
+            str(baseline_path),
+        ],
+    )
+    assert passing.exit_code == 0
+
+    failing = runner.invoke(
+        app,
+        [
+            "ci",
+            str(REPO_ROOT / "examples" / "sample_trace.json"),
+            "--baseline",
+            str(baseline_path),
+            "--fail-on",
+            "score_below:101",
+        ],
+    )
+    assert failing.exit_code == 1
+
+
+def test_ci_command_config_error_exit_code(tmp_path: Path) -> None:
+    result = runner.invoke(
+        app,
+        [
+            "ci",
+            str(REPO_ROOT / "examples" / "sample_trace.json"),
+            "--baseline",
+            str(tmp_path / "baseline.json"),
+            "--fail-on",
+            "garbage-not-a-clause",
+        ],
+    )
+    assert result.exit_code == 2
+
+
+def test_ci_command_writes_pr_comment_sarif_and_junit_outputs(tmp_path: Path) -> None:
+    pr_comment_path = tmp_path / "pr_comment.md"
+    sarif_path = tmp_path / "wattage.sarif"
+    junit_path = tmp_path / "junit.xml"
+    badge_path = tmp_path / "badge.svg"
+
+    result = runner.invoke(
+        app,
+        [
+            "ci",
+            str(REPO_ROOT / "benchmarks" / "traces" / "any_agent_openai.otlp.json"),
+            "--baseline",
+            str(tmp_path / "baseline.json"),
+            "--fail-on",
+            "score_below:0,any_critical:false",
+            "--pr-comment-out",
+            str(pr_comment_path),
+            "--sarif-out",
+            str(sarif_path),
+            "--junit-out",
+            str(junit_path),
+            "--badge-out",
+            str(badge_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "no baseline yet" in pr_comment_path.read_text(encoding="utf-8")
+    assert json.loads(sarif_path.read_text(encoding="utf-8"))["version"] == "2.1.0"
+    assert junit_path.read_text(encoding="utf-8").startswith('<?xml version="1.0"')
+    assert badge_path.read_text(encoding="utf-8").startswith('<?xml version="1.0"')

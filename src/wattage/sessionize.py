@@ -37,9 +37,7 @@ def sessionize(spans: Iterable[RawSpan], source: str) -> Trace:
     for span in all_spans:
         by_trace[span.trace_id or span.span_id].append(span)
 
-    sessions = [
-        _build_session(trace_id, trace_spans) for trace_id, trace_spans in by_trace.items()
-    ]
+    sessions = [_build_session(trace_id, trace_spans) for trace_id, trace_spans in by_trace.items()]
     return Trace(source=source, sessions=sessions)
 
 

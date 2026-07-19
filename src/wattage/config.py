@@ -30,9 +30,7 @@ class RedundantToolCallsConfig(BaseModel):
     enabled: bool = True
     window: int = 5
     fuzzy: bool = True
-    exempt_tools: list[str] = Field(
-        default_factory=lambda: ["poll_status", "wait", "healthcheck"]
-    )
+    exempt_tools: list[str] = Field(default_factory=lambda: ["poll_status", "wait", "healthcheck"])
 
 
 class ConvergenceWeightsConfig(BaseModel):
@@ -57,9 +55,7 @@ class NonConvergenceConfig(BaseModel):
     osc_window: int = 6
     max_period: int = 4
     weights: ConvergenceWeightsConfig = Field(default_factory=ConvergenceWeightsConfig)
-    exempt_tools: list[str] = Field(
-        default_factory=lambda: ["poll_status", "wait", "healthcheck"]
-    )
+    exempt_tools: list[str] = Field(default_factory=lambda: ["poll_status", "wait", "healthcheck"])
     embed: str = "local"
     judge: str = "off"
 
@@ -97,21 +93,33 @@ class DetectorsConfig(BaseModel):
     prefix_churn: PrefixChurnConfig = Field(default_factory=PrefixChurnConfig)
     cache_gap: CacheGapConfig = Field(default_factory=CacheGapConfig)
     verbosity: VerbosityConfig = Field(default_factory=VerbosityConfig)
-    redundant_tool_calls: RedundantToolCallsConfig = Field(
-        default_factory=RedundantToolCallsConfig
-    )
+    redundant_tool_calls: RedundantToolCallsConfig = Field(default_factory=RedundantToolCallsConfig)
     nonconvergence: NonConvergenceConfig = Field(default_factory=NonConvergenceConfig)
     retrieval_thrash: RetrievalThrashConfig = Field(default_factory=RetrievalThrashConfig)
     model_mismatch: ModelMismatchConfig = Field(default_factory=ModelMismatchConfig)
-    reasoning_overspend: ReasoningOverspendConfig = Field(
-        default_factory=ReasoningOverspendConfig
-    )
+    reasoning_overspend: ReasoningOverspendConfig = Field(default_factory=ReasoningOverspendConfig)
 
 
 class QualityConfig(BaseModel):
     target: float = 0.90
 
 
+class CIFailOnConfig(BaseModel):
+    score_below: int | None = 80
+    cost_delta_pct_above: float | None = 5.0
+    any_critical: bool = True
+
+
+class CIConfig(BaseModel):
+    baseline_path: str = ".wattage/baseline.json"
+    rolling_window_days: int = 7
+    fail_on: CIFailOnConfig = Field(default_factory=CIFailOnConfig)
+    pr_comment: bool = True
+    badge_out: str | None = None
+    sarif_out: str | None = None
+
+
 class WattageConfig(BaseModel):
     detectors: DetectorsConfig = Field(default_factory=DetectorsConfig)
     quality: QualityConfig = Field(default_factory=QualityConfig)
+    ci: CIConfig = Field(default_factory=CIConfig)

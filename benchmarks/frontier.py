@@ -162,9 +162,7 @@ def render_frontier_svg(points: list[FrontierPoint]) -> str:
         )
         parts.append(f'<circle cx="{x1:.1f}" cy="{y1:.1f}" r="5" fill="#e34948"/>')
         parts.append(f'<circle cx="{x2:.1f}" cy="{y2:.1f}" r="5" fill="#008300"/>')
-        label = escape(
-            f"{point.fix_id}: ${point.before_dollars:.4f} → ${point.after_dollars:.4f}"
-        )
+        label = escape(f"{point.fix_id}: ${point.before_dollars:.4f} → ${point.after_dollars:.4f}")
         label_y = margin["top"] - 30 + i * 14
         parts.append(
             f'<text x="{margin["left"]:.1f}" y="{label_y:.1f}" fill="#0b0b0b">{label}</text>'
@@ -198,8 +196,7 @@ if __name__ == "__main__":
     else:
         for p in pts:
             print(
-                f"{p.trace_source} [{p.fix_id}]: "
-                f"${p.before_dollars:.6f} -> ${p.after_dollars:.6f}"
+                f"{p.trace_source} [{p.fix_id}]: ${p.before_dollars:.6f} -> ${p.after_dollars:.6f}"
             )
             print(f"  quality: {p.before_quality} -> {p.after_quality} ({p.quality_note})")
         svg = render_frontier_svg(pts)
