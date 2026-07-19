@@ -6,10 +6,10 @@
     "wattage": "./bin/wattage.js"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/muhammadfaizanraza/wattage",
+  "homepage": "https://github.com/faizannraza/wattage",
   "repository": {
     "type": "git",
-    "url": "https://github.com/muhammadfaizanraza/wattage"
+    "url": "https://github.com/faizannraza/wattage"
   },
   "keywords": ["llm", "agents", "opentelemetry", "cost", "tokens"],
   "engines": {
