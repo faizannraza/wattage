@@ -161,7 +161,7 @@ jobs:
       - name: Generate trace fixture
         run: python scripts/run_agent_fixture.py > trace.json
       - name: Wattage cost-regression gate
-        uses: faizannraza/wattage/action@main
+        uses: faizannraza/wattage/action@v0.1.0
         with:
           source: trace.json
           baseline: .wattage/baseline.json

@@ -23,7 +23,7 @@ jobs:
       - name: Generate trace fixture
         run: python scripts/run_agent_fixture.py > trace.json   # your own deterministic eval run
       - name: Wattage cost-regression gate
-        uses: faizannraza/wattage/action@main
+        uses: faizannraza/wattage/action@v0.1.0
         with:
           source: trace.json
           baseline: .wattage/baseline.json
@@ -37,7 +37,7 @@ jobs:
         with: { sarif_file: wattage.sarif }
 ```
 
-Run this only on pull requests, with a `paths:` filter and `concurrency.cancel-in-progress` — running it on every commit floods the PR with noise and (if the optional LLM judge is ever enabled) burns real API budget for no benefit. `uses: faizannraza/wattage/action@main` tracks the Action's default branch; pin to a released tag (`@v1`, once one exists) once you want a stable, immovable reference.
+Run this only on pull requests, with a `paths:` filter and `concurrency.cancel-in-progress` — running it on every commit floods the PR with noise and (if the optional LLM judge is ever enabled) burns real API budget for no benefit. `uses: faizannraza/wattage/action@v0.1.0` pins to a released, immutable tag rather than tracking a moving branch, so a future Wattage release can't silently change what your existing workflows run.
 
 ## 2. The baseline updater
 
@@ -58,7 +58,7 @@ jobs:
       - name: Generate trace fixture
         run: python scripts/run_agent_fixture.py > trace.json
       - name: Update Wattage baseline
-        uses: faizannraza/wattage/action@main
+        uses: faizannraza/wattage/action@v0.1.0
         with:
           source: trace.json
           baseline: .wattage/baseline.json
