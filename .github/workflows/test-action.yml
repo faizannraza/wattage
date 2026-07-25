@@ -1,0 +1,52 @@
+name: Test Action (self-dogfood)
+
+# Runs the real composite action (action/action.yml) against a real trace on
+# an actual GitHub Actions runner — installing wattage from the real published
+# PyPI package, not a local checkout — so "the Action works" is a verified
+# fact, not an assertion. Triggered manually, and automatically whenever the
+# action itself changes, so this stays real regression coverage rather than
+# a one-off check.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "action/**"
+
+jobs:
+  self-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run the composite action against a real trace with a real finding
+        id: wattage
+        uses: ./action
+        with:
+          source: benchmarks/traces/any_agent_openai.otlp.json
+          baseline: /tmp/wattage-selftest-baseline.json
+          fail-on: "score_below:0,any_critical:false"
+          pr-comment: "false"
+          sarif-out: /tmp/wattage-selftest.sarif
+          junit-out: /tmp/wattage-selftest-junit.xml
+          badge-out: /tmp/wattage-selftest-badge.svg
+
+      - name: Assert the action produced the expected real output
+        run: |
+          test "${{ steps.wattage.outputs.exit-code }}" = "0"
+          test -s /tmp/wattage-selftest-baseline.json
+          test -s /tmp/wattage-selftest.sarif
+          test -s /tmp/wattage-selftest-junit.xml
+          test -s /tmp/wattage-selftest-badge.svg
+          grep -q "prefix_churn" /tmp/wattage-selftest.sarif
+
+      - name: Upload generated outputs for manual inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wattage-selftest-outputs
+          path: |
+            /tmp/wattage-selftest-baseline.json
+            /tmp/wattage-selftest.sarif
+            /tmp/wattage-selftest-junit.xml
+            /tmp/wattage-selftest-badge.svg
