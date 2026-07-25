@@ -5,12 +5,12 @@ you exactly where your tokens are being burned and wasted, prices each waste
 pattern in real dollars, prescribes a fix, and can fail your CI when a change
 makes your agent measurably more expensive.
 
-<!--
-TODO(maintainer): record a ~10s terminal GIF of the one-liner below producing
-the report, and one of `wattage report --html` opened in a browser, then
-replace this comment with:
 ![wattage report demo](docs/assets/demo.gif)
--->
+
+*A real captured agent trace (see [provenance](benchmarks/traces/README.md)) —
+Wattage catches a stable prompt prefix being re-sent instead of cached, prices
+the waste, and prescribes the fix. Regenerate this GIF with
+`vhs docs/assets/demo.tape` (see the tape file for the exact command).*
 
 ## Install and run
 
