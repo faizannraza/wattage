@@ -41,3 +41,6 @@ site/
 /wattage.sarif
 /junit.xml
 /wattage-badge.svg
+
+# Internal build spec / planning doc — kept locally, not part of the public repo
+/WATTAGE_BUILD_DOC.md
