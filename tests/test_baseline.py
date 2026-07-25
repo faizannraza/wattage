@@ -83,6 +83,37 @@ def test_failing_run_does_not_update_last_passing() -> None:
     assert len(baseline.history) == 2  # still recorded for the log
 
 
+def test_record_run_accepts_a_z_suffixed_timestamp() -> None:
+    """datetime.fromisoformat only accepts a trailing "Z" from Python 3.11
+    onward; this project's floor is 3.10, and baseline.json is a plain
+    committed file a user or another tool could write a "Z"-suffixed
+    recorded_at into (report.py's own generator uses "+00:00", but nothing
+    stops an external writer from using the equally-valid "Z" form).
+    """
+    now = datetime.now(timezone.utc)
+    report = Report(
+        trace_source="t",
+        total_dollars=1.0,
+        token_breakdown={},
+        findings=[],
+        score=Score(
+            efficiency=80,
+            grade="B",
+            waste_ratio=0.1,
+            quality_factor=1.0,
+            quality_measured=False,
+            recoverable_dollars=0.0,
+        ),
+        pricing_version="v",
+        generated_at=now.strftime("%Y-%m-%dT%H:%M:%S") + "Z",
+    )
+
+    baseline = record_run(Baseline(), report, passed=True)
+
+    assert baseline.last_passing is not None
+    assert len(baseline.history) == 1
+
+
 def test_cost_delta_pct_matches_hand_computed_percentage() -> None:
     now = datetime.now(timezone.utc)
     baseline = record_run(Baseline(), _report(1.0, [], now), passed=True)

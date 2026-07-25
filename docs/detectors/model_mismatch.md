@@ -10,6 +10,12 @@ A call is a downgrade candidate when its iteration produced a tool call (its job
 
 **By default, this detector produces nothing at all without evidence.** `require_quality_map` defaults to `true`: recommending a model swap is consequential enough that the project's own design treats "no evidence the cheaper model actually works here" as a reason to stay silent, not merely to caveat the finding. Supply a `--quality quality.json` with a `downgrade_evals` entry (`"tool_select@<candidate-model>": {"pass_rate": 0.97}`) showing the candidate model passes at or above the configured threshold, and the detector starts reporting real, dollar-quantified findings.
 
+`examples/quality.json` is a working, real example of the full shape (both `tasks` for the score gate and `downgrade_evals` for this detector) — try it:
+
+```bash
+uv run wattage report examples/sample_trace.json --quality examples/quality.json
+```
+
 ## Fix
 
 Route this specific step to the configured cheaper candidate model (`claude-haiku-4-5` for Anthropic, `gpt-5.6-luna` for OpenAI, by default — configurable per provider).

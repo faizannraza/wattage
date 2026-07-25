@@ -21,6 +21,15 @@ from pydantic import BaseModel, Field
 from wattage.models import Report
 
 
+def _parse_iso8601(value: str) -> datetime:
+    """datetime.fromisoformat only accepts a trailing "Z" (the standard
+    UTC designator) starting in Python 3.11; this project's floor is 3.10,
+    and baseline.json is a plain committed file a user or another tool
+    could hand-edit with a "Z"-suffixed timestamp.
+    """
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
 class DetectorSnapshot(BaseModel):
     wasted_tokens: int = 0
     wasted_dollars: float = 0.0
@@ -88,8 +97,8 @@ def save_baseline(path: str | Path, baseline: Baseline) -> None:
 def record_run(baseline: Baseline, report: Report, passed: bool, window_days: int = 7) -> Baseline:
     snapshot = snapshot_from_report(report)
     history = [*baseline.history, snapshot]
-    cutoff = datetime.fromisoformat(snapshot.recorded_at) - timedelta(days=window_days)
-    history = [s for s in history if datetime.fromisoformat(s.recorded_at) >= cutoff]
+    cutoff = _parse_iso8601(snapshot.recorded_at) - timedelta(days=window_days)
+    history = [s for s in history if _parse_iso8601(s.recorded_at) >= cutoff]
     last_passing = snapshot if passed else baseline.last_passing
     return Baseline(last_passing=last_passing, history=history)
 

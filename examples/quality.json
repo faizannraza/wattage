@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "task-001": { "eval_score": 0.94 },
+    "task-002": { "eval_score": 0.91 }
+  },
+  "downgrade_evals": {
+    "tool_select@claude-haiku-4-5": { "pass_rate": 0.95 }
+  }
+}
