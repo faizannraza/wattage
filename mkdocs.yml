@@ -30,6 +30,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Getting your first trace: getting-started.md
   - Adapters: adapters.md
   - Detectors:
       - Overview: detectors/index.md

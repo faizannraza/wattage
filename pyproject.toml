@@ -37,6 +37,12 @@ dev = [
   "pytest-golden>=0.2",
   "hypothesis>=6.100",
   "types-pyyaml>=6.0",
+  # Only needed to test examples/instrument_minimal.py (the "getting your
+  # first trace" doc's zero-instrumentation snippet) — never a runtime
+  # dependency of the wattage package itself, which just parses OTLP JSON
+  # directly and never touches the OTel SDK/API.
+  "opentelemetry-sdk>=1.25",
+  "opentelemetry-exporter-otlp-proto-common>=1.25",
 ]
 docs = [
   "mkdocs>=1.6",

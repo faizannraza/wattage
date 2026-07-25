@@ -13,3 +13,10 @@
   ```bash
   uv run wattage report examples/sample_trace.json --quality examples/quality.json
   ```
+
+- **`instrument_minimal.py`** — for anyone with zero existing OTel
+  instrumentation: a real, runnable OpenTelemetry snippet that produces a
+  `trace.json` Wattage can read, using OTel's own official OTLP JSON
+  encoder. See [`docs/getting-started.md`](../docs/getting-started.md).
+  `tests/test_instrument_minimal_example.py` runs it as a real subprocess
+  and asserts on the priced output, so it can't silently rot.

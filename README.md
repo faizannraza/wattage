@@ -19,8 +19,11 @@ uvx wattage report trace.json
 ```
 
 No config file, no API key, fully offline — point it at an [OTLP JSON](https://opentelemetry.io/docs/specs/otlp/)
-trace export and it prices every call and runs every detector. Try it right
-now against the fixture shipped in this repo:
+trace export and it prices every call and runs every detector. Don't have a
+trace yet? [Getting your first trace](docs/getting-started.md) covers both
+"I already have OTel traces" and "I have zero instrumentation" (a runnable,
+5-minute path from nothing to a real, priced report). Or try it right now
+against the fixture shipped in this repo:
 
 ```bash
 git clone https://github.com/faizannraza/wattage

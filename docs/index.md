@@ -24,10 +24,11 @@ Wattage is a **diagnosis + prescription + gate**, not another dashboard:
 uvx wattage report trace.json
 ```
 
-That's it — no config file, no API key, fully offline. Point it at an [OTLP JSON](adapters.md) export of your agent's trace and it prices every call, runs every detector, and prints a report.
+That's it — no config file, no API key, fully offline. Point it at an [OTLP JSON](adapters.md) export of your agent's trace and it prices every call, runs every detector, and prints a report. Don't have one yet? See [Getting your first trace](getting-started.md) — covers both "I already have OTel traces" and "I have zero instrumentation."
 
 ## Where to go next
 
+- **[Getting your first trace](getting-started.md)** — start here if you don't already have an OTLP JSON trace to point Wattage at.
 - **[Adapters](adapters.md)** — what trace formats Wattage reads, and how it tolerates the real-world naming differences between frameworks.
 - **[Detectors](detectors/index.md)** — the eight waste patterns Wattage looks for, one page each.
 - **[The Convergence Engine](convergence.md)** — the standout: how Wattage catches agents thrashing in unproductive loops, and why exact-match duplicate detection can't.
