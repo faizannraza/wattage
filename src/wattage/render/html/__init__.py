@@ -14,6 +14,7 @@ import json
 from xml.sax.saxutils import escape
 
 from wattage.models import Report, Trace
+from wattage.render.format import format_dollars
 from wattage.render.html.tree import build_tree
 
 _SEVERITY_STATUS = {
@@ -340,7 +341,7 @@ def _render_findings(report: Report) -> str:
             '<div class="finding-head">'
             f'<span class="sev-chip sev-{status}">{escape(finding.severity.value)}</span>'
             f'<span class="finding-id">{escape(finding.id)}</span>'
-            f'<span class="dollars num">${finding.wasted_dollars:.4f}</span>'
+            f'<span class="dollars num">{format_dollars(finding.wasted_dollars)}</span>'
             "</div>"
             f'<div class="evidence">{escape(finding.evidence)}</div>'
             f'<div class="fix">{escape(finding.fix)}</div>'

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from wattage.baseline import Baseline, DetectorDelta, diff_against_baseline
 from wattage.models import Report
+from wattage.render.format import format_dollars
 
 
 def _fmt_tokens(n: int) -> str:
@@ -25,13 +26,13 @@ def _fmt_tokens(n: int) -> str:
 
 def _delta_cell(delta: DetectorDelta) -> tuple[str, str]:
     if delta.is_new:
-        return "▲ new", f"${delta.current_dollars:.4f}"
+        return "▲ new", format_dollars(delta.current_dollars)
     pct = delta.pct_change
     if pct is None:
-        return "—", f"${delta.current_dollars:.4f}"
+        return "—", format_dollars(delta.current_dollars)
     arrow = "▲" if pct > 0 else ("▼" if pct < 0 else "—")
     sign = "+" if pct >= 0 else ""
-    return f"{arrow} {sign}{pct:.0f}%", f"${delta.current_dollars:.4f}"
+    return f"{arrow} {sign}{pct:.0f}%", format_dollars(delta.current_dollars)
 
 
 def render_pr_comment(report: Report, baseline: Baseline) -> str:
@@ -78,7 +79,8 @@ def render_pr_comment(report: Report, baseline: Baseline) -> str:
         top = max(report.findings, key=lambda f: f.wasted_dollars)
         quality_note = " (quality-neutral)" if top.quality_risk.value == "none" else ""
         lines.append(
-            f"**Top fix:** {top.fix} → ~${top.wasted_dollars:.4f}/run recoverable{quality_note}."
+            f"**Top fix:** {top.fix} → ~{format_dollars(top.wasted_dollars)}"
+            f"/run recoverable{quality_note}."
         )
         lines.append("")
 

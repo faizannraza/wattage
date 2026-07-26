@@ -11,6 +11,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from wattage.models import Report
+from wattage.render.format import format_dollars
 
 
 def render_terminal(report: Report, console: Console | None = None) -> None:
@@ -38,7 +39,7 @@ def render_terminal(report: Report, console: Console | None = None) -> None:
         findings_table.add_column("Wasted $", justify="right")
         findings_table.add_column("Fix")
         for f in report.findings:
-            findings_table.add_row(f.id, f.severity.value, f"${f.wasted_dollars:.4f}", f.fix)
+            findings_table.add_row(f.id, f.severity.value, format_dollars(f.wasted_dollars), f.fix)
         console.print(findings_table)
     else:
         console.print("[dim]No findings — this trace looks efficient.[/dim]")
