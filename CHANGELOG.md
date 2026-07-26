@@ -153,6 +153,17 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Removed
 
+- **`numpy` and `pydantic-settings` dropped as runtime dependencies.**
+  Found by an independent adversarial review: both were declared in
+  `pyproject.toml`'s core `dependencies` but never imported anywhere in
+  `src/` (confirmed by grep across the whole tree) — dead weight on every
+  install, and `pydantic-settings` pulled in `python-dotenv` transitively
+  along with it. `config.py` (the module the removed
+  `WATTAGE_BUILD_DOC.md`'s build plan expected to use
+  `pydantic-settings`) actually just uses plain `pydantic.BaseModel` +
+  `yaml.safe_load` — a real, already-shipped, already-tested
+  implementation, so this is a documentation-catching-up-to-code removal,
+  not a functional change. The unused `numpy.*` mypy override is gone too.
 - `WATTAGE_BUILD_DOC.md` dropped from git tracking (kept locally) — an
   internal planning document, not part of the public-facing repo.
 

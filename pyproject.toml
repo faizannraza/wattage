@@ -20,11 +20,9 @@ classifiers = [
 ]
 dependencies = [
   "pydantic>=2.6",
-  "pydantic-settings>=2.2",
   "typer>=0.12",
   "rich>=13.7",
   "pyyaml>=6.0",
-  "numpy>=1.26",
 ]
 
 [project.optional-dependencies]
@@ -88,15 +86,6 @@ packages = ["wattage"]
 mypy_path = "src"
 strict = true
 disallow_untyped_defs = true
-
-# numpy's bundled stubs use PEP 695 syntax (3.12+), newer than our python_version
-# target; we don't use numpy yet, so skip following it rather than lowering
-# our own code's target-version bar.
-[[tool.mypy.overrides]]
-module = "numpy.*"
-follow_imports = "skip"
-follow_imports_for_stubs = true
-ignore_errors = true
 
 # sentence-transformers is the optional wattage[embeddings] extra; not
 # installed by default, so its absence must not fail mypy.
