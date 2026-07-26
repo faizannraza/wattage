@@ -11,7 +11,12 @@ from pathlib import Path
 
 import pytest
 
+from wattage.config import WattageConfig
+from wattage.detectors.base import AnalysisContext
+from wattage.detectors.redundant_tool_calls import RedundantToolCallsDetector
 from wattage.models import Iteration, Loop, Report, Score, Session, Task, ToolCall, Trace
+from wattage.pricing.engine import PricingEngine
+from wattage.pricing.registry import PricingRegistry
 from wattage.render.html import render_html
 from wattage.report import build_trace_and_report
 
@@ -114,6 +119,40 @@ def test_trace_content_cannot_break_out_of_the_script_block() -> None:
         return None
 
     assert find_tool_name(data) == payload
+
+
+def test_trace_content_containing_a_placeholder_token_is_not_reexpanded() -> None:
+    """The real bug this closes: render_html did sequential str.replace()
+    calls against one growing string, substituting __FINDINGS_HTML__ before
+    __TREE_JSON__. A finding's evidence text can legitimately contain the
+    literal text "__TREE_JSON__" (e.g. a tool actually named that), and the
+    later __TREE_JSON__ replacement would re-match that already-inserted
+    text, leaking the entire serialized tree JSON blob into the findings
+    sidebar. A single regex pass over the static template (this test's
+    fix) never rescans already-substituted content, so this can't happen
+    regardless of what a placeholder-named tool call's evidence contains.
+    """
+    tool_a = ToolCall(span_id="sp1", name="__TREE_JSON__", result="x" * 40)
+    tool_b = ToolCall(span_id="sp2", name="__TREE_JSON__", result="x" * 40)
+    iteration_a = Iteration(index=0, tool_calls=[tool_a])
+    iteration_b = Iteration(index=1, tool_calls=[tool_b])
+    loop = Loop(loop_id="loop1", iterations=[iteration_a, iteration_b])
+    task = Task(task_id="task1", loops=[loop])
+    session = Session(session_id="s1", tasks=[task])
+    trace = Trace(source="src", sessions=[session])
+    report = _unpriced_report(0, [])
+
+    ctx = AnalysisContext(pricing=PricingEngine(PricingRegistry.load()), config=WattageConfig())
+    report.findings = RedundantToolCallsDetector().analyze(session, ctx)
+    assert report.findings  # sanity: the detector actually fired
+
+    html = render_html(trace, report)
+
+    evidence_start = html.find('<div class="evidence">')
+    evidence_end = html.find("</div>", evidence_start)
+    evidence_div = html[evidence_start:evidence_end]
+    assert "kind" not in evidence_div  # the leaked tree JSON would contain this
+    assert "__TREE_JSON__" in evidence_div  # the real tool name, shown as itself
 
 
 def test_fully_priced_trace_has_no_unpriced_banner() -> None:

@@ -7,6 +7,22 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **The HTML flame graph could corrupt itself via a template-placeholder
+  collision in trace content.** `render_html` substituted its template
+  tokens (`__TREE_JSON__`, `__FINDINGS_HTML__`, etc.) with sequential
+  `str.replace()` calls on one growing string — and `__FINDINGS_HTML__`
+  (which embeds trace-derived, HTML-escaped finding evidence/fix text) was
+  substituted *before* `__TREE_JSON__`. Reproduced: a tool literally named
+  `__TREE_JSON__` in trace content produced a finding whose evidence text
+  contains that literal string; once inserted into the page, the later
+  `__TREE_JSON__` replacement re-matched it and substituted the *entire*
+  serialized flame-graph tree JSON into the findings sidebar. Not
+  executable (the earlier XSS fix's escaping held), but genuine
+  untrusted-input-driven page corruption. Fixed: a single regex pass over
+  the static template with a dict-lookup callback, which by construction
+  never rescans already-substituted content — verified with the same
+  reproduction (now shows the literal tool name) and visually confirmed in
+  a real browser.
 - **A corrupt `.wattage/baseline.json` broke `wattage ci`'s exit-code
   contract.** `run_ci`'s `try/except` around ingestion never extended to
   `load_baseline`/`record_run`/`save_baseline` — found by an independent

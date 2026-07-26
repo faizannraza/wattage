@@ -11,6 +11,7 @@ sidebar.
 from __future__ import annotations
 
 import json
+import re
 from xml.sax.saxutils import escape
 
 from wattage.models import Report, Trace
@@ -367,23 +368,50 @@ def _json_for_script(data: object) -> str:
     )
 
 
+_PLACEHOLDER_RE = re.compile(
+    "|".join(
+        re.escape(p)
+        for p in (
+            "__TITLE__",
+            "__SOURCE__",
+            "__UNPRICED_BANNER__",
+            "__SCORE_CHIP_CLASS__",
+            "__SCORE_CHIP_CONTENT__",
+            "__FINDING_COUNT__",
+            "__FINDINGS_HTML__",
+            "__PRICING_VERSION__",
+            "__GENERATED_AT__",
+            "__TREE_JSON__",
+        )
+    )
+)
+
+
 def render_html(trace: Trace, report: Report) -> str:
     tree = build_tree(trace)
     findings_html = _render_findings(report)
     score_chip_class, score_chip_content = _score_chip(report)
 
-    html = _TEMPLATE
-    html = html.replace("__TITLE__", escape(f"wattage burn map — {report.trace_source}"))
-    html = html.replace("__SOURCE__", escape(report.trace_source))
-    html = html.replace("__UNPRICED_BANNER__", _unpriced_banner(report))
-    html = html.replace("__SCORE_CHIP_CLASS__", score_chip_class)
-    html = html.replace("__SCORE_CHIP_CONTENT__", score_chip_content)
-    html = html.replace("__FINDING_COUNT__", str(len(report.findings)))
-    html = html.replace("__FINDINGS_HTML__", findings_html)
-    html = html.replace("__PRICING_VERSION__", escape(report.pricing_version))
-    html = html.replace("__GENERATED_AT__", escape(report.generated_at))
-    html = html.replace("__TREE_JSON__", _json_for_script(tree))
-    return html
+    # Trace content (finding evidence/fix text, tool/model/query names) can
+    # legitimately contain the literal text of another placeholder token --
+    # e.g. a tool named "__TREE_JSON__" -- so sequential str.replace() calls
+    # would let a later call re-match text a prior call just inserted,
+    # substituting again inside already-substituted content. A single regex
+    # pass over the original, static _TEMPLATE never rescans replacement
+    # text, so this can't happen regardless of what's in the substitutions.
+    substitutions = {
+        "__TITLE__": escape(f"wattage burn map — {report.trace_source}"),
+        "__SOURCE__": escape(report.trace_source),
+        "__UNPRICED_BANNER__": _unpriced_banner(report),
+        "__SCORE_CHIP_CLASS__": score_chip_class,
+        "__SCORE_CHIP_CONTENT__": score_chip_content,
+        "__FINDING_COUNT__": str(len(report.findings)),
+        "__FINDINGS_HTML__": findings_html,
+        "__PRICING_VERSION__": escape(report.pricing_version),
+        "__GENERATED_AT__": escape(report.generated_at),
+        "__TREE_JSON__": _json_for_script(tree),
+    }
+    return _PLACEHOLDER_RE.sub(lambda m: substitutions[m.group(0)], _TEMPLATE)
 
 
 def _render_findings(report: Report) -> str:
