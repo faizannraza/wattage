@@ -1,6 +1,6 @@
 {
   "name": "wattage-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "npx shim for wattage, a token-spend profiler and cost-regression gate for AI agents. Shells out to the Python core via uvx/pipx.",
   "bin": {
     "wattage": "bin/wattage.js"
