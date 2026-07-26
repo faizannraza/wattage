@@ -135,21 +135,22 @@ evidence/state computation over a long real trajectory.
   identical args later in this stretch → **redundant_tool_calls** should
   fire once.
 - it5 (mid-exploration): a file-summary chat call with no max_tokens cap
-  and 1500 output tokens → **verbosity** fires (medium, since 1500 < 3000).
+  and 1600 output tokens → **verbosity** fires (medium, since 1600 < 3000).
 - it6: a "which file is the bug in" decision call with 700 reasoning tokens
   and only 55 output tokens → **reasoning_overspend** fires (medium, since
   700 < 1500 = 3x ceiling).
-- it7-20 (14 iterations): STALLED pattern at real scale — every iteration
+- it7-21 (15 iterations): STALLED pattern at real scale — every iteration
   calls run_tests(attempt=i) (same tool, fuzzy arg), result is always
   "FAILED: 2 tests still failing" (near-identical boilerplate), input_tok
   EXPLICITLY GROWS each iteration (context accumulating failed-attempt
   history) — same proven technique as `growing_context_no_evidence`, scaled
-  to 14 iterations instead of 5. Never recovers.
-- it21: loop ends here, still mid-tool-call (no final chat-only answer) →
-  reached_success=False.
+  to 15 iterations instead of 5. The last of these (it21) is what determines
+  reached_success=False: the loop ends still mid-tool-call, with no final
+  chat-only answer, same as every other iteration in this stretch. Never
+  recovers.
 - Expect: **nonconvergence** fires, subtype should be **stalled** (evidence
   and state both low, growth_penalty high across the trailing streak — the
-  streak here is large, likely all 14+ of the it7-20 run since it0-6 should
+  streak here is large, likely all 15 of the it7-21 run since it0-6 should
   score above theta_prog individually). Open verification point: does the
   cumulative nature of evidence_gain (novelty vs. ALL prior info, not just
   the trailing window) get confused by the genuinely-novel it0-4 content

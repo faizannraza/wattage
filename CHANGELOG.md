@@ -7,6 +7,16 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Two more pre-existing `GROUND_TRUTH.md` inaccuracies**, caught while
+  re-deriving the reasoning-token numbers in the same file: scenario 2's
+  it5 verbosity bait was documented as "1500 output tokens" (actual code
+  and the real detector evidence both say 1600 — severity classification
+  unaffected, 1600 is still under the 3000 high-severity threshold), and
+  the STALLED-loop section split "it7-20 (14 iterations)" plus a
+  separately-called-out "it21" as if the last iteration were constructed
+  differently — it isn't; all 15 iterations (it7-21) come from the same
+  uniform loop body. Both corrected to match the actual generator code and
+  the real detector output.
 - **Reasoning tokens were double-billed on every reasoning-model call.**
   Confirmed against both providers' own docs, not assumed: OpenAI's
   `completion_tokens_details.reasoning_tokens` and Anthropic's
