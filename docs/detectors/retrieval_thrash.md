@@ -10,12 +10,13 @@ For each retrieval-tagged iteration, the detector computes how novel its retriev
 
 ## Known limitations
 
-Two signals from the fuller design are honestly left unimplemented rather than faked:
+One signal from the fuller design is honestly left unimplemented rather than faked:
 
-- **Relevance yield** (per-chunk relevance scores) needs data the model *can* carry (`RetrievalCall.chunks`) but that no adapter currently populates.
 - **SLO-awareness** (flagging over-retrieval specifically against a latency budget) needs a latency budget input nothing currently supplies.
 
-Both are natural extension points once the underlying data exists — see `CONTRIBUTING.md`.
+This is a natural extension point once that input exists — see `CONTRIBUTING.md`.
+
+**Relevance yield** (per-chunk relevance scores) is partially available: the adapter populates `RetrievalCall.chunks` from a `retrieval.chunks` attribute (a JSON-encoded array, or a native OTLP `arrayValue`/`kvlistValue`), including a chunk's `relevance_score` if the exporter sends one — but no detector reads that sub-field yet. The chunk *text* is already used for evidence-yield, so genuine `embeddings`-kind retrieval spans are analyzed the same way plain retrieval-shaped tool calls are.
 
 ## Fix
 

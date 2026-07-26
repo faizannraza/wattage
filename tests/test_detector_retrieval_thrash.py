@@ -1,7 +1,17 @@
 from wattage.config import WattageConfig
 from wattage.detectors.base import AnalysisContext
 from wattage.detectors.retrieval_thrash import RetrievalThrashDetector
-from wattage.models import Finding, Iteration, LLMCall, Loop, Session, Task, TokenUsage, ToolCall
+from wattage.models import (
+    Finding,
+    Iteration,
+    LLMCall,
+    Loop,
+    RetrievalCall,
+    Session,
+    Task,
+    TokenUsage,
+    ToolCall,
+)
 from wattage.pricing.engine import PricingEngine
 from wattage.pricing.registry import PricingRegistry
 
@@ -83,6 +93,32 @@ def test_too_few_retrieval_iterations_is_not_analyzed() -> None:
         for i in range(2)
     ]
     assert _run(iterations, engine) == []
+
+
+def test_repeated_low_yield_embeddings_kind_retrieval_is_flagged() -> None:
+    """The RetrievalCall/chunks path (genuine SpanKind.embeddings spans, no
+    tool call at all) must fire exactly like the tool-name-heuristic path
+    above on an equivalent low-yield pattern -- not silently stay empty."""
+    engine = PricingEngine(PricingRegistry.load())
+    iterations = [
+        Iteration(
+            index=i,
+            llm_calls=[_llm(f"l{i}", engine)],
+            retrievals=[
+                RetrievalCall(
+                    span_id=f"e{i}",
+                    query=f"query variant {i}",
+                    chunks=[{"text": "No new information beyond prior summary."}],
+                )
+            ],
+        )
+        for i in range(5)
+    ]
+    findings = _run(iterations, engine)
+    assert len(findings) == 1
+    assert findings[0].quality_risk.value == "review"
+    assert findings[0].wasted_tokens > 0
+    assert findings[0].span_ids == ["e1", "e2", "e3", "e4"]  # it0 exempt (no prior to compare)
 
 
 def test_non_retrieval_tool_calls_are_ignored() -> None:

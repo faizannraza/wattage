@@ -10,11 +10,14 @@ validation (benchmarks/traces/) confirmed most real agent frameworks
 implement "retrieval" as a plain tool call rather than a dedicated
 `embeddings`-kind span.
 
-Two doc-specified signals are honestly left unimplemented rather than
-faked: "relevance yield" needs per-chunk relevance scores
-(RetrievalCall.chunks can carry them, but no adapter populates them yet),
-and "SLO-awareness" needs a latency budget input nothing currently supplies.
-Both are documented gaps for a future adapter/config enhancement.
+One doc-specified signal is honestly left unimplemented rather than faked:
+"SLO-awareness" needs a latency budget input nothing currently supplies —
+a documented gap for a future adapter/config enhancement. "Relevance
+yield" needs per-chunk relevance scores; `normalize.py` populates
+`RetrievalCall.chunks` (from a `retrieval.chunks` attribute) with whatever
+a chunk dict carries, including a `relevance_score` key if the exporter
+sends one, but no detector reads that sub-field yet — the chunk *text* is
+already used for evidence-yield below.
 
 quality_risk is "review" (doc §6.3 explicitly categorizes "aggressive
 retrieval cuts" as review-risk) — capping retrieval could hurt a genuinely
@@ -111,6 +114,19 @@ class RetrievalThrashDetector:
                     if price is not None:
                         wasted_dollars += tokens * price.input
                     span_ids.append(tc.span_id)
+            for retrieval in it.retrievals:
+                chunk_text_len = sum(
+                    len(str(chunk.get("text", "")))
+                    for chunk in retrieval.chunks
+                    if isinstance(chunk, dict)
+                )
+                if chunk_text_len == 0:
+                    continue
+                tokens = chunk_text_len // 4
+                wasted_tokens += tokens
+                if price is not None:
+                    wasted_dollars += tokens * price.input
+                span_ids.append(retrieval.span_id)
 
         if wasted_tokens == 0:
             return None

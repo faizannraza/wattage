@@ -86,6 +86,33 @@ def normalize_tool_call(span: RawSpan) -> ToolCall:
     )
 
 
+def _retrieval_chunks(a: dict[str, Any]) -> list[dict[str, Any]]:
+    """`retrieval.chunks` isn't part of the GenAI semconv yet (no standard
+    exists for retrieved-chunk content), so this accepts either a
+    JSON-encoded string (common for exporters that flatten complex values
+    into a single string attribute, same as gen_ai.tool.call.arguments) or
+    an already-decoded list (a real OTLP arrayValue/kvlistValue attribute
+    decodes to a native Python list before this function ever sees it).
+    Plain strings in the list are wrapped as {"text": ...} for convenience;
+    dicts are passed through as-is so a relevance score can ride alongside.
+    """
+    raw = a.get("retrieval.chunks")
+    if isinstance(raw, str):
+        try:
+            raw = json.loads(raw)
+        except json.JSONDecodeError:
+            return []
+    if not isinstance(raw, list):
+        return []
+    chunks: list[dict[str, Any]] = []
+    for item in raw:
+        if isinstance(item, dict):
+            chunks.append(item)
+        elif isinstance(item, str):
+            chunks.append({"text": item})
+    return chunks
+
+
 def normalize_retrieval_call(span: RawSpan) -> RetrievalCall:
     a = span.attributes
     return RetrievalCall(
@@ -93,6 +120,7 @@ def normalize_retrieval_call(span: RawSpan) -> RetrievalCall:
         parent_id=span.parent_span_id,
         query=_stringify(a.get("gen_ai.embeddings.input") or a.get("retrieval.query")),
         top_k=a.get("retrieval.top_k"),
+        chunks=_retrieval_chunks(a),
         start_ns=span.start_ns,
         end_ns=span.end_ns,
     )
