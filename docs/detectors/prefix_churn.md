@@ -13,6 +13,8 @@ Wattage doesn't require message content capture to catch this. For each pair of 
 
 ...then that prior context was almost certainly re-sent verbatim. The monotonic-growth check in condition 2 is what keeps this from flagging a genuinely different or shrunk prefix — a prompt that got smaller or changed shape between turns isn't churn.
 
+A resend smaller than the model's own minimum cacheable prefix size (vendored per-model — 1024 tokens for most models today, 4096 for Claude Haiku) is never flagged: below that size, the provider won't create a cache entry for it at all, so "enable prompt caching" wouldn't actually fix anything.
+
 The reported dollar figure is the *recoverable* amount, not the full resent cost: a cached prefix still bills at a provider's cache-read rate (10% of the input rate for every model in the vendored registry today), it isn't free. Recoverable dollars = resent tokens × input rate × (1 − cache-read rate).
 
 ## Known limitation

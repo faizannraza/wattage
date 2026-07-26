@@ -54,6 +54,46 @@ def test_exact_known_resent_prefix_yields_exact_wasted_tokens() -> None:
     assert finding.span_ids == ["b"]
 
 
+def test_resend_below_the_models_min_cacheable_prefix_is_not_flagged() -> None:
+    """The real bug this closes: min_cacheable_prefix_tokens was parsed from
+    the pricing registry (claude-haiku-4-5's is 4096) but never consulted
+    anywhere. Flagging a resent prefix smaller than that with "enable
+    prompt caching" as the fix is confident, specific, actionable advice
+    that the provider will not honor -- caching genuinely isn't available
+    below its own minimum, so this must not fire."""
+    engine = PricingEngine(PricingRegistry.load())
+    # prior_total = 1_500 + 500 = 2_000 < claude-haiku-4-5's 4_096 minimum.
+    call_a = _priced_call(
+        engine, "a", input_tok=1_500, output_tok=500, start=0, model="claude-haiku-4-5"
+    )
+    call_b = _priced_call(
+        engine, "b", input_tok=2_100, output_tok=100, start=1, model="claude-haiku-4-5"
+    )
+    task = Task(task_id="t0", llm_calls=[call_a, call_b])
+    session = Session(session_id="s0", tasks=[task])
+
+    findings = PrefixChurnDetector().analyze(session, _ctx(engine))
+
+    assert findings == []
+
+
+def test_same_size_resend_is_flagged_for_a_model_with_a_lower_minimum() -> None:
+    """Control for the test above: the exact same 2_000-token resend is
+    flagged for claude-sonnet-4-6, whose minimum (1_024) it clears -- proof
+    the suppression is keyed on the model's own threshold, not a blanket
+    size cutoff."""
+    engine = PricingEngine(PricingRegistry.load())
+    call_a = _priced_call(engine, "a", input_tok=1_500, output_tok=500, start=0)
+    call_b = _priced_call(engine, "b", input_tok=2_100, output_tok=100, start=1)
+    task = Task(task_id="t0", llm_calls=[call_a, call_b])
+    session = Session(session_id="s0", tasks=[task])
+
+    findings = PrefixChurnDetector().analyze(session, _ctx(engine))
+
+    assert len(findings) == 1
+    assert findings[0].wasted_tokens == 2_000
+
+
 def test_guard_never_flags_when_cache_read_present() -> None:
     engine = PricingEngine(PricingRegistry.load())
     call_a = _priced_call(engine, "a", input_tok=12_000, output_tok=300, start=0)

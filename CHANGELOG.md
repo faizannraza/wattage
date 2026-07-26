@@ -7,6 +7,19 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **`prefix_churn` could recommend a fix that wouldn't work.**
+  `min_cacheable_prefix_tokens` was parsed from the pricing registry into
+  every `ModelPrice` (1024 tokens for most vendored models, 4096 for
+  Claude Haiku) but never consulted anywhere — so a resent prefix smaller
+  than a model's own minimum cacheable size still got flagged with "enable
+  prompt caching" as the fix, even though the provider won't create a
+  cache entry that small at all; the recommended fix genuinely would not
+  help. `find_resent_segments` (shared by this detector and
+  `benchmarks/frontier.py`'s before/after simulation, so both changed
+  together and stay consistent) now takes the pricing registry and
+  excludes any resend below the resending call's own model's
+  `min_cacheable_prefix_tokens`. An unknown model's threshold can't be
+  checked, so those segments are left in rather than guessed away.
 - **`prefix_churn`'s reported dollar figure overstated the achievable
   savings by ~10%.** `Finding.wasted_dollars` credited the *full* resent
   cost (`resent_tokens * price.input`) as recoverable, as if enabling

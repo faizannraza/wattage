@@ -66,7 +66,7 @@ def _simulate_caching_fix(trace_path: Path) -> FrontierPoint | None:
     cached_dollars = 0.0
     for session in trace.sessions:
         for task in session.tasks:
-            for call, resent_tokens in find_resent_segments(task):
+            for call, resent_tokens in find_resent_segments(task, registry):
                 try:
                     price = registry.get(call.provider, call.model)
                 except UnknownModelError:

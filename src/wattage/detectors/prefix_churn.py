@@ -21,16 +21,23 @@ benchmarks/frontier.py's real-data before/after simulation. Severity stays
 keyed on the gross resent_dollars share of task cost (doc §4.1) -- how much
 of the task's spend the churn touches at all, not how much of that is
 ultimately recoverable.
+
+find_resent_segments also filters out a resend below the model's own
+min_cacheable_prefix_tokens (vendored per-model in the pricing registry):
+below that size, the provider won't create a cache entry for it at all, so
+"enable prompt caching" -- the fix this detector recommends -- genuinely
+would not help. Flagging it anyway would be confident, specific, actionable
+advice that doesn't work, which is worse than not flagging it.
 """
 
 from __future__ import annotations
 
 from wattage.detectors.base import AnalysisContext, ordered_llm_calls
 from wattage.models import Finding, LLMCall, QualityRisk, Session, Severity, Task
-from wattage.pricing.registry import UnknownModelError
+from wattage.pricing.registry import PricingRegistry, UnknownModelError
 
 
-def find_resent_segments(task: Task) -> list[tuple[LLMCall, int]]:
+def find_resent_segments(task: Task, registry: PricingRegistry) -> list[tuple[LLMCall, int]]:
     """(call, resent_tokens) pairs where `call` almost certainly re-sent the
     entire prior call's context uncached — the pure detection logic, reused
     by this detector and by benchmarks/frontier.py's real-data caching-fix
@@ -43,6 +50,16 @@ def find_resent_segments(task: Task) -> list[tuple[LLMCall, int]]:
         prior_total = prev.usage.input + prev.usage.output
         if prior_total <= 0 or curr.usage.input < prior_total:
             continue  # prefix shrank or changed; not a simple resend
+        try:
+            # curr is the request that would need to mark this prefix
+            # cacheable, so curr's own model/provider is what governs
+            # whether that provider's minimum cacheable size is met.
+            price = registry.get(curr.provider, curr.model)
+        except UnknownModelError:
+            segments.append((curr, prior_total))  # can't check the threshold; don't guess
+            continue
+        if prior_total < price.min_cacheable_prefix_tokens:
+            continue  # too small for this provider to cache at all -- not a fixable gap
         segments.append((curr, prior_total))
     return segments
 
@@ -56,7 +73,7 @@ class PrefixChurnDetector:
         findings: list[Finding] = []
 
         for task in session.tasks:
-            segments = find_resent_segments(task)
+            segments = find_resent_segments(task, ctx.pricing.registry)
             if not segments:
                 continue
 
