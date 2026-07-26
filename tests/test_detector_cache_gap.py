@@ -94,6 +94,27 @@ def test_no_caching_attempted_is_not_flagged_here() -> None:
     assert CacheGapDetector().analyze(session, _ctx(engine)) == []
 
 
+def test_zero_premium_provider_is_not_flagged_even_fully_unredeemed() -> None:
+    """openai/gpt-5.6-luna has cache_write_mult == 1.0 (no cache-write
+    premium, per pricing.yaml) -- a fully-unread cache write there costs
+    exactly what plain input tokens would have, so there is genuinely
+    nothing to redeem. This must stay silent by design, not be treated as
+    a missed detection."""
+    engine = PricingEngine(PricingRegistry.load())
+    call = LLMCall(
+        span_id="a",
+        provider="openai",
+        model="gpt-5.6-luna",
+        usage=TokenUsage(input=1000, output=100, cache_creation=5000, cache_read=0),
+        start_ns=0,
+    )
+    call.cost = engine.price_call(call)
+    task = Task(task_id="t4", llm_calls=[call])
+    session = Session(session_id="s4", tasks=[task])
+
+    assert CacheGapDetector().analyze(session, _ctx(engine)) == []
+
+
 @given(
     cache_creation=st.integers(min_value=1, max_value=1_000_000),
     read_ratio=st.floats(min_value=1.0, max_value=5.0),

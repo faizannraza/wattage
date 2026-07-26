@@ -11,6 +11,12 @@ also a documented root cause in the doc, but it's indistinguishable from
 cache_creation == cache_read == 0. Detecting it would need the request's
 cache_control attribute (not part of the OTel GenAI usage attributes we
 read), so it's left for a future adapter enhancement rather than guessed at.
+
+By design, not a gap: this only fires when there's an actual premium to
+redeem. A provider with cache_write_mult == 1.0 (no cache-write premium at
+all — OpenAI's model today) costs the same whether those tokens are
+cached or sent as plain input, so an unredeemed write there has genuinely
+wasted nothing beyond what plain input would have cost anyway.
 """
 
 from __future__ import annotations
