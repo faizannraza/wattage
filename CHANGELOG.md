@@ -7,6 +7,23 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **The HTML flame graph ("burn map") was vulnerable to stored XSS via trace
+  content.** Flame-graph node names (tool names, model strings, retrieval
+  queries) come straight from an OTLP trace — untrusted input, since
+  `wattage report --html` will render whatever file it's given — and were
+  embedded into `const DATA = ...` via a bare `json.dumps()`. That escapes
+  for JSON string syntax but not for HTML: a literal `</script>` inside a
+  string value (e.g. a tool name of `</script><script>...` closed the
+  legitimate `<script>` tag early and let the rest execute as a new,
+  attacker-controlled script — in this self-contained report that's
+  routinely opened directly in a browser and shared/screenshotted. Verified
+  in a real browser: a crafted tool name previously fired an injected
+  script; confirmed inert after the fix (data still round-trips correctly
+  to the exact original string). Fixed with a `_json_for_script()` helper
+  that escapes `<`, `>`, `&`, and the U+2028/U+2029 line separators as
+  `\uXXXX` sequences before embedding (the same approach Django's
+  `json_script` filter uses) — a no-op for `JSON.parse`, but the sequence
+  can no longer terminate the tag.
 - **JUnit XML output could be invalid XML.** Finding `evidence`/`fix` text
   (derived from trace content — untrusted input on the `wattage ci` path)
   and `--fail-on` failure reasons were escaped with `xml.sax.saxutils.escape()`

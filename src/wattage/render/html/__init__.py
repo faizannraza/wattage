@@ -343,6 +343,30 @@ def _unpriced_banner(report: Report) -> str:
     )
 
 
+def _json_for_script(data: object) -> str:
+    """json.dumps(), hardened for embedding inside a <script> block.
+
+    Tree node names come straight from trace content (tool names, model
+    strings, retrieval queries) -- untrusted input, since anyone can hand
+    `wattage report --html` an arbitrary trace file. json.dumps() escapes
+    for JSON string syntax but not for HTML: a literal `</script>` in a
+    string value closes the tag early and lets whatever follows execute as
+    a new <script> in the shareable, often-opened-in-a-browser HTML report.
+    Escaping </>/& as \\u-sequences (same approach as Django's json_script)
+    is a no-op for JSON.parse but can no longer terminate the tag; U+2028/
+    U+2029 are escaped too since they're valid JSON but were historically
+    invalid unescaped in a JS string literal.
+    """
+    encoded = json.dumps(data)
+    return (
+        encoded.replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+        .replace("&", "\\u0026")
+        .replace(" ", "\\u2028")
+        .replace(" ", "\\u2029")
+    )
+
+
 def render_html(trace: Trace, report: Report) -> str:
     tree = build_tree(trace)
     findings_html = _render_findings(report)
@@ -358,7 +382,7 @@ def render_html(trace: Trace, report: Report) -> str:
     html = html.replace("__FINDINGS_HTML__", findings_html)
     html = html.replace("__PRICING_VERSION__", escape(report.pricing_version))
     html = html.replace("__GENERATED_AT__", escape(report.generated_at))
-    html = html.replace("__TREE_JSON__", json.dumps(tree))
+    html = html.replace("__TREE_JSON__", _json_for_script(tree))
     return html
 
 

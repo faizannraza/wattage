@@ -5,12 +5,13 @@ error on a real trace, and is scanned for zero external http(s):// fetches
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
 import pytest
 
-from wattage.models import Report, Score, Trace
+from wattage.models import Iteration, Loop, Report, Score, Session, Task, ToolCall, Trace
 from wattage.render.html import render_html
 from wattage.report import build_trace_and_report
 
@@ -76,6 +77,43 @@ def test_unpriced_trace_shows_a_banner_and_not_a_letter_grade_chip() -> None:
     assert 'class="score-chip unpriced"' in html
     assert "A (100)" not in html
     assert "No findings on the priced portion" in html
+
+
+def test_trace_content_cannot_break_out_of_the_script_block() -> None:
+    """The real bug this closes: flame-graph node names (tool names, model
+    strings, retrieval queries) come straight from trace content -- and
+    anyone can hand `wattage report --html` an arbitrary trace file. A tool
+    name of "</script><script>...", embedded via bare json.dumps() into
+    `const DATA = ...`, closed the legitimate <script> tag early and let
+    the rest execute as a new, attacker-controlled <script> in this
+    self-contained, often-opened-in-a-browser HTML report -- a stored XSS.
+    """
+    payload = "</script><script>alert(document.cookie)</script>"
+    tool = ToolCall(span_id="sp1", name=payload, result="x")
+    iteration = Iteration(index=0, tool_calls=[tool])
+    loop = Loop(loop_id="loop1", iterations=[iteration])
+    task = Task(task_id="task1", loops=[loop])
+    session = Session(session_id="s1", tasks=[task])
+    trace = Trace(source="src", sessions=[session])
+    report = _unpriced_report(0, [])
+
+    html = render_html(trace, report)
+
+    assert "</script><script>" not in html
+    start = html.find("const DATA = ") + len("const DATA = ")
+    end = html.find(";\n", start)
+    data = json.loads(html[start:end])
+
+    def find_tool_name(node: dict) -> str | None:
+        if node.get("kind") == "tool":
+            return node["name"]  # type: ignore[no-any-return]
+        for child in node.get("children", []):
+            found = find_tool_name(child)
+            if found is not None:
+                return found
+        return None
+
+    assert find_tool_name(data) == payload
 
 
 def test_fully_priced_trace_has_no_unpriced_banner() -> None:
