@@ -7,6 +7,20 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **`docs/detectors/prefix_churn.md` cited an uncited statistic.** "independent
+  audits have found re-sent context accounts for roughly 60% of a typical
+  agent's spend" had no source anywhere in the repo — an unverifiable claim
+  attributed to unnamed "independent audits," exactly the kind of
+  plausible-looking-but-unfounded number this project exists to avoid in
+  its own reports, let alone its own docs. Checked whether this project's
+  own committed benchmark scenarios could stand in for it instead: the real
+  measured prefix_churn share of total cost across them ranges from 0% to
+  84%, too wide and too dependent on each fixture's specific design to
+  responsibly compress into one "roughly 60%"-style headline number. Fixed
+  by dropping the fabricated statistic and stating the real, verifiable
+  reason this detector is high-leverage: an agent loop resends its entire
+  system prompt, tool schemas, and growing history on every turn absent
+  caching, so the miss compounds with every additional call.
 - **The HTML flame graph ("burn map") was vulnerable to stored XSS via trace
   content.** Flame-graph node names (tool names, model strings, retrieval
   queries) come straight from an OTLP trace — untrusted input, since

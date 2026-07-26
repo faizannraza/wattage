@@ -2,7 +2,7 @@
 
 **Detects:** a large, stable prefix (system prompt, tool schemas, conversation history) being re-sent and re-billed at full price on every turn, instead of being cached.
 
-This is the single highest-leverage fix in most agent bills — independent audits have found re-sent context accounts for roughly 60% of a typical agent's spend, and it's usually just a missing configuration flag away from being fixed.
+This is often the single highest-leverage fix in an agent's bill: an agent loop typically re-sends its entire system prompt, tool schemas, and growing conversation history on every turn, so paying full price for that prefix on every single call compounds fast as a session gets longer — and it's usually just a missing configuration flag away from being fixed.
 
 ## How it works
 
