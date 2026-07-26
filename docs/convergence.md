@@ -31,7 +31,7 @@ Rather than assert this works, the project built a hand-reviewed, empirically-ve
 Run it yourself:
 
 ```bash
-python -m benchmarks.harness
+uv run python -m benchmarks.harness
 ```
 
 ## Embeddings: local by default, no API key required

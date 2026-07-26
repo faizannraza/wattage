@@ -2,6 +2,7 @@ import io
 import json
 from pathlib import Path
 
+import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
@@ -37,6 +38,28 @@ def test_report_output_matches_golden_fixture() -> None:
 
     golden = (REPO_ROOT / "examples" / "sample_report.golden.txt").read_text()
     assert buf.getvalue() == golden
+
+
+def test_default_console_is_pinned_to_a_fixed_width_not_the_live_terminal(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """render_terminal's default (no console passed -- the real path every
+    CLI invocation actually takes) must render at a fixed width regardless
+    of the ambient terminal, or the exact same report looks different for
+    every user/environment, contradicting the "share this, docs show
+    exactly this" premise the report is built around."""
+    report = build_report("examples/sample_trace.json")
+
+    render_terminal(report)
+
+    out = capsys.readouterr().out
+    border_line = next(line for line in out.splitlines() if line.startswith("╭"))
+    golden_border = next(
+        line
+        for line in (REPO_ROOT / "examples" / "sample_report.golden.txt").read_text().splitlines()
+        if line.startswith("╭")
+    )
+    assert len(border_line) == len(golden_border)
 
 
 def test_report_prices_example_fixture_correctly() -> None:

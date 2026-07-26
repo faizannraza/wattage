@@ -13,9 +13,17 @@ from rich.table import Table
 from wattage.models import Report
 from wattage.render.format import format_dollars
 
+# A bare Console() auto-detects the live terminal's width, so the exact same
+# report renders at a different box width for every user/environment (and
+# differently again for a non-tty/piped invocation) -- undermining the
+# "share a screenshot, docs show exactly this" premise the report/README are
+# built around. Pinned to a fixed width instead, so output is reproducible
+# regardless of the caller's terminal.
+_DEFAULT_WIDTH = 100
+
 
 def render_terminal(report: Report, console: Console | None = None) -> None:
-    console = console or Console()
+    console = console or Console(width=_DEFAULT_WIDTH)
 
     headline = (
         f"[bold]Token Efficiency:[/bold] {report.score.grade} ({report.score.efficiency})"
