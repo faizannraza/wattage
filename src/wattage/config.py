@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pathlib import Path
+from typing import Any
+
+import yaml
+from pydantic import BaseModel, Field, ValidationError
 
 
 class PrefixChurnConfig(BaseModel):
@@ -114,12 +118,60 @@ class CIConfig(BaseModel):
     baseline_path: str = ".wattage/baseline.json"
     rolling_window_days: int = 7
     fail_on: CIFailOnConfig = Field(default_factory=CIFailOnConfig)
-    pr_comment: bool = True
+    # Default output paths, so a CI job doesn't have to repeat
+    # --badge-out/--sarif-out/--pr-comment-out on every wattage ci
+    # invocation -- an explicit CLI flag always overrides these.
     badge_out: str | None = None
     sarif_out: str | None = None
+    pr_comment_out: str | None = None
 
 
 class WattageConfig(BaseModel):
     detectors: DetectorsConfig = Field(default_factory=DetectorsConfig)
     quality: QualityConfig = Field(default_factory=QualityConfig)
     ci: CIConfig = Field(default_factory=CIConfig)
+
+
+class WattageConfigError(Exception):
+    """A wattage.yaml file exists but couldn't be read, parsed, or
+    validated against the schema above."""
+
+
+DEFAULT_CONFIG_FILENAME = "wattage.yaml"
+
+
+def load_config(path: str | None = None) -> WattageConfig:
+    """Load a wattage.yaml config file into a WattageConfig.
+
+    An explicit `path` always wins, and raises WattageConfigError if it
+    can't be read/parsed/validated -- asking for a specific file and
+    having it silently ignored would hide a real mistake. With no
+    explicit path, this looks for `./wattage.yaml` in the current working
+    directory (the convention every command assumes for `.wattage/
+    baseline.json` too); if that's absent, a config file is optional, not
+    required, so this returns plain defaults rather than erroring.
+    """
+    if path is None:
+        if not Path(DEFAULT_CONFIG_FILENAME).is_file():
+            return WattageConfig()
+        path = DEFAULT_CONFIG_FILENAME
+
+    try:
+        with open(path, encoding="utf-8") as f:
+            raw: Any = yaml.safe_load(f)
+    except OSError as exc:
+        raise WattageConfigError(f"could not read config file {path!r}: {exc}") from exc
+    except yaml.YAMLError as exc:
+        raise WattageConfigError(f"invalid YAML in {path!r}: {exc}") from exc
+
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, dict):
+        raise WattageConfigError(
+            f"{path!r} must be a YAML mapping at the top level, got {type(raw).__name__}"
+        )
+
+    try:
+        return WattageConfig.model_validate(raw)
+    except ValidationError as exc:
+        raise WattageConfigError(f"invalid config in {path!r}:\n{exc}") from exc

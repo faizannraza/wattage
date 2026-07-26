@@ -5,6 +5,7 @@ import typer
 
 from wattage import __version__
 from wattage.ci import CIConfigError, parse_fail_on, run_ci
+from wattage.config import WattageConfig, WattageConfigError, load_config
 from wattage.render.badge import render_badge
 from wattage.render.html import render_html
 from wattage.render.json_report import render_json
@@ -25,6 +26,17 @@ def _version_callback(value: bool) -> None:
     if value:
         typer.echo(f"wattage {__version__}")
         raise typer.Exit()
+
+
+_CONFIG_HELP = "Path to a wattage.yaml config file. Defaults to ./wattage.yaml if present."
+
+
+def _load_config_or_exit(config_path: Path | None) -> WattageConfig:
+    try:
+        return load_config(str(config_path) if config_path else None)
+    except WattageConfigError as exc:
+        typer.echo(f"config error: {exc}", err=True)
+        raise typer.Exit(code=2) from exc
 
 
 @app.callback()
@@ -55,12 +67,15 @@ def report(
         Path | None,
         typer.Option("--html", help="Write a self-contained HTML flame graph."),
     ] = None,
+    config: Annotated[Path | None, typer.Option("--config", help=_CONFIG_HELP)] = None,
 ) -> None:
     """Ingest a trace and print a priced, findings-quantified report."""
+    cfg = _load_config_or_exit(config)
     if html_output is not None:
         trace, report_obj = build_trace_and_report(
             str(source),
             pricing_override=str(pricing) if pricing else None,
+            config=cfg,
             quality_file=str(quality) if quality else None,
         )
         html_output.write_text(render_html(trace, report_obj), encoding="utf-8")
@@ -69,6 +84,7 @@ def report(
     report_obj = build_report(
         str(source),
         pricing_override=str(pricing) if pricing else None,
+        config=cfg,
         quality_file=str(quality) if quality else None,
     )
     if json_output:
@@ -85,11 +101,14 @@ def score(
         Path | None,
         typer.Option(help="Path to a quality.json map; enables quality-gated findings."),
     ] = None,
+    config: Annotated[Path | None, typer.Option("--config", help=_CONFIG_HELP)] = None,
 ) -> None:
     """Print just the Token Efficiency score and dollar headline."""
+    cfg = _load_config_or_exit(config)
     report_obj = build_report(
         str(source),
         pricing_override=str(pricing) if pricing else None,
+        config=cfg,
         quality_file=str(quality) if quality else None,
     )
     if report_obj.unpriced_calls:
@@ -115,11 +134,14 @@ def badge(
     out: Annotated[
         Path | None, typer.Option("--out", help="Write the SVG to this file instead of stdout.")
     ] = None,
+    config: Annotated[Path | None, typer.Option("--config", help=_CONFIG_HELP)] = None,
 ) -> None:
     """Emit a Token Efficiency SVG badge."""
+    cfg = _load_config_or_exit(config)
     report_obj = build_report(
         str(source),
         pricing_override=str(pricing) if pricing else None,
+        config=cfg,
         quality_file=str(quality) if quality else None,
     )
     svg = render_badge(report_obj)
@@ -159,8 +181,10 @@ def ci(
     badge_out: Annotated[
         Path | None, typer.Option("--badge-out", help="Write a Token Efficiency SVG badge here.")
     ] = None,
+    config: Annotated[Path | None, typer.Option("--config", help=_CONFIG_HELP)] = None,
 ) -> None:
     """Cost-regression gate for CI: fails the build on a real regression."""
+    cfg = _load_config_or_exit(config)
     try:
         parsed_fail_on = parse_fail_on(fail_on) if fail_on else None
     except CIConfigError as exc:
@@ -173,22 +197,29 @@ def ci(
         pricing_override=str(pricing) if pricing else None,
         quality_file=str(quality) if quality else None,
         fail_on=parsed_fail_on,
+        config=cfg,
     )
+
+    resolved_pr_comment_out = pr_comment_out or (
+        Path(cfg.ci.pr_comment_out) if cfg.ci.pr_comment_out else None
+    )
+    resolved_sarif_out = sarif_out or (Path(cfg.ci.sarif_out) if cfg.ci.sarif_out else None)
+    resolved_badge_out = badge_out or (Path(cfg.ci.badge_out) if cfg.ci.badge_out else None)
 
     if result.report is not None:
         render_terminal(result.report)
-        if pr_comment_out is not None and result.baseline is not None:
-            pr_comment_out.write_text(
+        if resolved_pr_comment_out is not None and result.baseline is not None:
+            resolved_pr_comment_out.write_text(
                 render_pr_comment(result.report, result.baseline), encoding="utf-8"
             )
-        if sarif_out is not None:
-            sarif_out.write_text(render_sarif(result.report), encoding="utf-8")
+        if resolved_sarif_out is not None:
+            resolved_sarif_out.write_text(render_sarif(result.report), encoding="utf-8")
         if junit_out is not None:
             junit_out.write_text(
                 render_junit(result.report, ci_reasons=result.reasons), encoding="utf-8"
             )
-        if badge_out is not None:
-            badge_out.write_text(render_badge(result.report), encoding="utf-8")
+        if resolved_badge_out is not None:
+            resolved_badge_out.write_text(render_badge(result.report), encoding="utf-8")
 
     for reason in result.reasons:
         typer.echo(f"- {reason}", err=result.exit_code != 0)

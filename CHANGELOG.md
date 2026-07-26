@@ -7,6 +7,26 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **`wattage.yaml` didn't actually exist as a load path.** `config.py`'s own
+  docstring called itself "wattage.yaml config schema" and CONTRIBUTING.md
+  told detector authors a user could turn a detector off "in wattage.yaml,"
+  but no code path anywhere ever read such a file — every command
+  constructed a bare `WattageConfig()` with defaults, unconditionally, no
+  matter what was on disk. Fixed: a new `load_config()` auto-discovers
+  `./wattage.yaml` in the current working directory (matching the existing
+  `.wattage/baseline.json` convention), or loads an explicit path via the
+  new `--config` flag on all four commands (`report`, `score`, `badge`,
+  `ci`); a bad explicit path (missing file, invalid YAML, schema violation)
+  is a clear exit code 2, matching the project's existing config-error
+  convention. While documenting this fix, found and closed the same bug
+  class twice more inside `CIConfig` itself: `badge_out`/`sarif_out` were
+  schema fields that were never actually consulted as fallbacks for
+  `--badge-out`/`--sarif-out`, and `pr_comment: bool` was fully vestigial
+  (zero real consumers — the Action's actual PR-comment toggle is its own
+  independent `INPUT_PR_COMMENT` env var). Removed the dead `pr_comment`
+  field and wired `badge_out`, `sarif_out`, and a new `pr_comment_out` field
+  as real fallbacks in `wattage ci`, exactly like the pre-existing, working
+  `baseline_path`/`fail_on` pattern.
 - **An unknown/unpriced model (e.g. a real model not yet in the vendored
   pricing registry, which covers only 9 models today) silently rendered
   as `A (100) · $0.0000 · this trace looks efficient`** in `report`,

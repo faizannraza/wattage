@@ -191,6 +191,143 @@ def test_quality_flag_wires_a_real_quality_factor(tmp_path: Path) -> None:
     assert with_quality.score.quality_factor < 1.0
 
 
+def test_config_flag_actually_changes_detector_behavior(tmp_path: Path) -> None:
+    """The real bug this closes: wattage.yaml had a full pydantic schema and
+    was described in config.py's own docstring and CONTRIBUTING.md, but no
+    code path anywhere ever loaded one -- every command silently used bare
+    defaults. This must change what the CLI actually reports, not just
+    parse without error."""
+    scenario = REPO_ROOT / "benchmarks" / "scenarios" / "scenario1.json"
+    without_config = runner.invoke(app, ["report", str(scenario), "--json"])
+    assert without_config.exit_code == 0
+    ids_without = {f["id"] for f in json.loads(without_config.stdout)["findings"]}
+    assert "redundant_tool_calls" in ids_without  # confirmed present in the base case
+
+    config_path = tmp_path / "wattage.yaml"
+    config_path.write_text("detectors:\n  redundant_tool_calls:\n    enabled: false\n")
+    with_config = runner.invoke(
+        app, ["report", str(scenario), "--json", "--config", str(config_path)]
+    )
+    assert with_config.exit_code == 0
+    ids_with = {f["id"] for f in json.loads(with_config.stdout)["findings"]}
+    assert "redundant_tool_calls" not in ids_with
+    assert ids_with == ids_without - {"redundant_tool_calls"}
+
+
+def test_ci_command_reads_fail_on_thresholds_from_config_file(tmp_path: Path) -> None:
+    """run_ci falls back to config.ci.fail_on when --fail-on isn't passed --
+    a different code path from build_report's config wiring, so this needs
+    its own real end-to-end check, not just an inference from the report/
+    score/badge tests passing."""
+    without_config = runner.invoke(
+        app,
+        [
+            "ci",
+            str(REPO_ROOT / "examples" / "sample_trace.json"),
+            "--baseline",
+            str(tmp_path / "baseline_a.json"),
+        ],
+    )
+    assert without_config.exit_code == 0  # passes on the default score_below:80
+
+    # sample_trace.json scores a perfect efficiency=100 -- no real
+    # score_below value could ever fail it, so 101 is deliberately
+    # impossible-to-satisfy, chosen only to prove this exact value came
+    # from the config file (not passed via --fail-on) and was actually
+    # read, not to represent a realistic threshold.
+    config_path = tmp_path / "wattage.yaml"
+    config_path.write_text("ci:\n  fail_on:\n    score_below: 101\n    any_critical: false\n")
+    with_config = runner.invoke(
+        app,
+        [
+            "ci",
+            str(REPO_ROOT / "examples" / "sample_trace.json"),
+            "--baseline",
+            str(tmp_path / "baseline_b.json"),
+            "--config",
+            str(config_path),
+        ],
+    )
+
+    # exit_code 1 (vs. 0 above, on the exact same trace and no other change)
+    # is the load-bearing proof the config file's threshold was read.
+    assert with_config.exit_code == 1
+
+
+def test_ci_command_reads_output_paths_from_config_file(tmp_path: Path) -> None:
+    """badge_out/sarif_out/pr_comment_out (doc §9.6) must actually be
+    consumed as fallbacks when the matching --*-out flag isn't passed --
+    these three config fields existed in the schema but were silently
+    ignored by the ci command until now."""
+    config_path = tmp_path / "wattage.yaml"
+    badge_path = tmp_path / "badge.svg"
+    sarif_path = tmp_path / "wattage.sarif"
+    pr_comment_path = tmp_path / "pr_comment.md"
+    config_path.write_text(
+        "ci:\n"
+        f"  badge_out: {badge_path}\n"
+        f"  sarif_out: {sarif_path}\n"
+        f"  pr_comment_out: {pr_comment_path}\n"
+    )
+
+    result = runner.invoke(
+        app,
+        [
+            "ci",
+            str(REPO_ROOT / "benchmarks" / "traces" / "any_agent_openai.otlp.json"),
+            "--baseline",
+            str(tmp_path / "baseline.json"),
+            "--fail-on",
+            "score_below:0,any_critical:false",
+            "--config",
+            str(config_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert badge_path.read_text(encoding="utf-8").startswith('<?xml version="1.0"')
+    assert json.loads(sarif_path.read_text(encoding="utf-8"))["version"] == "2.1.0"
+    assert "no baseline yet" in pr_comment_path.read_text(encoding="utf-8")
+
+
+def test_ci_command_explicit_flag_overrides_config_output_path(tmp_path: Path) -> None:
+    config_path = tmp_path / "wattage.yaml"
+    config_badge_path = tmp_path / "config_badge.svg"
+    flag_badge_path = tmp_path / "flag_badge.svg"
+    config_path.write_text(f"ci:\n  badge_out: {config_badge_path}\n")
+
+    result = runner.invoke(
+        app,
+        [
+            "ci",
+            str(REPO_ROOT / "examples" / "sample_trace.json"),
+            "--baseline",
+            str(tmp_path / "baseline.json"),
+            "--config",
+            str(config_path),
+            "--badge-out",
+            str(flag_badge_path),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert flag_badge_path.exists()
+    assert not config_badge_path.exists()
+
+
+def test_config_flag_missing_file_is_a_clean_exit_code_2(tmp_path: Path) -> None:
+    result = runner.invoke(
+        app,
+        [
+            "report",
+            str(REPO_ROOT / "examples" / "sample_trace.json"),
+            "--config",
+            str(tmp_path / "does_not_exist.yaml"),
+        ],
+    )
+    assert result.exit_code == 2
+
+
 def test_badge_command_prints_svg_to_stdout() -> None:
     result = runner.invoke(app, ["badge", str(REPO_ROOT / "examples" / "sample_trace.json")])
     assert result.exit_code == 0
