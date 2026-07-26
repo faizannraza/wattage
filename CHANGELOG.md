@@ -7,6 +7,17 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **JUnit XML output could be invalid XML.** Finding `evidence`/`fix` text
+  (derived from trace content — untrusted input on the `wattage ci` path)
+  and `--fail-on` failure reasons were escaped with `xml.sax.saxutils.escape()`
+  before being written into `render_junit`'s `name="..."`/`message="..."`
+  attributes, but that function only escapes `&`/`<`/`>` — not a literal
+  `"`. A single quote character in a finding's evidence or fix text (e.g.
+  quoted tool-call arguments) terminated the attribute early and produced
+  malformed XML that a JUnit-consuming CI system (GitLab, CircleCI,
+  Jenkins) couldn't parse. Fixed: attribute values now go through
+  `xml.sax.saxutils.quoteattr()`, which escapes and quotes correctly for
+  any input.
 - **A malformed trace could break `wattage ci`'s exit-code contract.** A
   span missing its required `spanId` field (or any other structurally
   malformed span — a non-object entry, a trace whose top-level JSON wasn't

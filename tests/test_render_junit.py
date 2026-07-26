@@ -80,3 +80,35 @@ def test_test_count_matches_gate_plus_findings() -> None:
     xml_str = render_junit(report)
     root = ET.fromstring(xml_str)
     assert root.get("tests") == "3"  # 1 gate + 2 findings
+
+
+def test_double_quotes_in_evidence_and_fix_text_do_not_break_the_xml() -> None:
+    """The real bug this closes: finding evidence/fix text is derived from
+    trace content -- untrusted input on the `wattage ci` path -- and used
+    to land inside double-quoted XML attributes. escape() alone only
+    handles &/</> , not a literal '"', so a quote in the text used to
+    terminate the attribute early and produce invalid XML a JUnit-consuming
+    CI system couldn't parse."""
+    finding = Finding(
+        id="verbosity",
+        severity=Severity.high,
+        wasted_tokens=10,
+        wasted_dollars=1.23,
+        quality_risk=QualityRisk.none,
+        evidence='tool call with "quoted" arg and <angle> & amp',
+        fix='trim the "weird" tokens & <stuff>',
+    )
+    report = _report([finding])
+
+    xml_str = render_junit(report, ci_reasons=['score is "bad" & <weird>'])
+
+    root = ET.fromstring(xml_str)  # raises on invalid XML
+    gate_case = next(
+        tc for tc in root.findall("testcase") if tc.get("classname") == "wattage.ci_gate"
+    )
+    assert gate_case.find("failure").get("message") == 'score is "bad" & <weird>'
+    finding_case = next(
+        tc for tc in root.findall("testcase") if tc.get("classname") == "wattage.verbosity"
+    )
+    assert '"quoted"' in finding_case.get("name")
+    assert '"weird"' in finding_case.find("failure").get("message")

@@ -5,7 +5,7 @@ wattage results natively without needing GitHub-specific integration.
 
 from __future__ import annotations
 
-from xml.sax.saxutils import escape
+from xml.sax.saxutils import escape, quoteattr
 
 from wattage.models import Report, Severity
 
@@ -13,30 +13,39 @@ _FAILING_SEVERITIES = {Severity.high, Severity.critical}
 
 
 def render_junit(report: Report, ci_reasons: list[str] | None = None) -> str:
+    """`escape()` alone only handles &/</> -- safe inside element text, but
+    every value below also lands inside a double-quoted attribute, and
+    finding evidence/fix text originates from trace content (untrusted
+    input in the `wattage ci` path), so a literal `"` must be escaped too.
+    `quoteattr()` escapes and quotes in one step, so it's used everywhere a
+    value is written as an attribute value.
+    """
     ci_reasons = ci_reasons or []
     testcases = []
 
-    gate_name = escape(f"Token Efficiency: {report.score.grade} ({report.score.efficiency})")
+    gate_name = quoteattr(f"Token Efficiency: {report.score.grade} ({report.score.efficiency})")
     if ci_reasons:
-        message = escape("; ".join(ci_reasons))
+        message_text = "; ".join(ci_reasons)
+        message_attr = quoteattr(message_text)
         testcases.append(
-            f'<testcase classname="wattage.ci_gate" name="{gate_name}">'
-            f'<failure message="{message}">{message}</failure></testcase>'
+            f'<testcase classname="wattage.ci_gate" name={gate_name}>'
+            f"<failure message={message_attr}>{escape(message_text)}</failure></testcase>"
         )
     else:
-        testcases.append(f'<testcase classname="wattage.ci_gate" name="{gate_name}"/>')
+        testcases.append(f'<testcase classname="wattage.ci_gate" name={gate_name}/>')
 
     for i, finding in enumerate(report.findings):
-        name = escape(f"{finding.id}[{i}]: {finding.evidence[:80]}")
+        name = quoteattr(f"{finding.id}[{i}]: {finding.evidence[:80]}")
         classname = f"wattage.{finding.id}"
         if finding.severity in _FAILING_SEVERITIES:
-            message = escape(f"${finding.wasted_dollars:.4f} wasted — {finding.fix}")
+            message_text = f"${finding.wasted_dollars:.4f} wasted — {finding.fix}"
+            message_attr = quoteattr(message_text)
             testcases.append(
-                f'<testcase classname="{classname}" name="{name}">'
-                f'<failure message="{message}">{message}</failure></testcase>'
+                f'<testcase classname="{classname}" name={name}>'
+                f"<failure message={message_attr}>{escape(message_text)}</failure></testcase>"
             )
         else:
-            testcases.append(f'<testcase classname="{classname}" name="{name}"/>')
+            testcases.append(f'<testcase classname="{classname}" name={name}/>')
 
     failures = sum(1 for f in report.findings if f.severity in _FAILING_SEVERITIES) + (
         1 if ci_reasons else 0
