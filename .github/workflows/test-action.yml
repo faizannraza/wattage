@@ -17,7 +17,7 @@ jobs:
   self-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Run the composite action against a real trace with a real finding
         id: wattage
