@@ -53,11 +53,13 @@ def render_pr_comment(report: Report, baseline: Baseline) -> str:
 
     if score.monthly_projection is not None:
         lines.append(
-            f"Estimated recoverable waste: **${score.recoverable_dollars:.2f}/run "
+            f"Estimated recoverable waste: **{format_dollars(score.recoverable_dollars)}/run "
             f"(~${score.monthly_projection:,.0f}/mo)**"
         )
     else:
-        lines.append(f"Estimated recoverable waste: **${score.recoverable_dollars:.4f}/run**")
+        lines.append(
+            f"Estimated recoverable waste: **{format_dollars(score.recoverable_dollars)}/run**"
+        )
     lines.append("")
 
     deltas = [

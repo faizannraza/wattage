@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 
+import yaml
 from pydantic import ValidationError
 
 from wattage.adapters.base import AdapterError
@@ -27,7 +28,9 @@ from wattage.baseline import (
 )
 from wattage.config import CIFailOnConfig, WattageConfig
 from wattage.models import Report, Severity
+from wattage.pricing.registry import PricingConfigError
 from wattage.report import build_trace_and_report
+from wattage.scoring.quality import QualityMapError
 
 EXIT_PASS = 0
 EXIT_FAIL = 1
@@ -48,6 +51,9 @@ class CIResult:
     reasons: list[str] = field(default_factory=list)
 
 
+_FAIL_ON_KEYS = frozenset({"score_below", "cost_delta_pct_above", "any_critical"})
+
+
 def parse_fail_on(spec: str) -> CIFailOnConfig:
     """Parses "key:value,key:value" — the doc's own action.yml example format,
     e.g. "score_below:80,cost_delta_pct_above:5,any_critical:true"."""
@@ -59,7 +65,13 @@ def parse_fail_on(spec: str) -> CIFailOnConfig:
         if ":" not in part:
             raise CIConfigError(f"invalid --fail-on clause (expected key:value): {part!r}")
         key, _, value = part.partition(":")
-        values[key.strip()] = value.strip()
+        key = key.strip()
+        if key not in _FAIL_ON_KEYS:
+            raise CIConfigError(
+                f"unrecognized --fail-on key {key!r} (expected one of "
+                f"{', '.join(sorted(_FAIL_ON_KEYS))})"
+            )
+        values[key] = value.strip()
 
     defaults = CIFailOnConfig()
     try:
@@ -128,6 +140,11 @@ def run_ci(
         # counts as "nothing to grade" instead of two copies that could
         # drift apart.
         return CIResult(exit_code=EXIT_INGESTION_ERROR, reasons=[str(exc)])
+    except (yaml.YAMLError, PricingConfigError, QualityMapError) as exc:
+        # A malformed --pricing override or --quality map is a config/
+        # usage problem, not a trace-ingestion one -- same exit code as a
+        # bad --config file, not exit 3.
+        return CIResult(exit_code=EXIT_CONFIG_ERROR, reasons=[str(exc)])
 
     if report.unpriced_calls > 0:
         models = ", ".join(report.unpriced_models)

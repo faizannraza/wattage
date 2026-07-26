@@ -9,6 +9,15 @@ output_tokens count, not an additional charge on top of it. This module
 does that split once, here, so every downstream consumer (pricing,
 token_breakdown, detectors) can just add usage.output + usage.reasoning
 without re-deriving or double-billing it.
+
+Cache tokens (cache_read/cache_creation) get the *same* subset treatment,
+but only for providers confirmed to report input_tokens inclusive of them
+-- unlike reasoning, real providers disagree here: OpenAI's prompt_tokens
+includes cached_tokens as a subset (same convention as reasoning), but
+Anthropic's API reports input_tokens/cache_creation_input_tokens/
+cache_read_input_tokens as three genuinely separate, additive fields (both
+confirmed against each provider's own docs). See _INCLUSIVE_CACHE_PROVIDERS
+below.
 """
 
 from __future__ import annotations
@@ -17,20 +26,26 @@ import hashlib
 import json
 from typing import Any
 
+from pydantic import ValidationError
+
 from wattage.adapters.base import AdapterError
 from wattage.models import LLMCall, RawSpan, RetrievalCall, TokenUsage, ToolCall
 
 
 def _as_token_count(value: Any, field: str) -> int:
-    """A negative token count can't come from a real provider response --
-    only from a corrupted or adversarially-crafted trace -- and would
-    otherwise silently subtract from total_dollars with no warning,
-    exactly the "plausible-looking-but-wrong number" this project exists
-    to avoid. Treated the same as any other malformed trace shape.
+    """A negative or non-numeric token count can't come from a real
+    provider response -- only from a corrupted or adversarially-crafted
+    trace -- and a negative one would otherwise silently subtract from
+    total_dollars with no warning, exactly the "plausible-looking-but-wrong
+    number" this project exists to avoid. Treated the same as any other
+    malformed trace shape.
     """
     if value is None:
         return 0
-    parsed = int(value)
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError) as exc:
+        raise AdapterError(f"{field} must be an integer, got {value!r}") from exc
     if parsed < 0:
         raise AdapterError(f"{field} cannot be negative, got {parsed}")
     return parsed
@@ -45,6 +60,16 @@ def _stringify(value: Any) -> str | None:
 def _canonical_hash(value: Any) -> str:
     payload = json.dumps(value, sort_keys=True, default=str)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+# Providers whose real API response is confirmed to report raw
+# input_tokens *inclusive* of cache tokens -- currently just OpenAI
+# (prompt_tokens includes cached_tokens, confirmed against OpenAI's own
+# docs). Every other provider (anthropic, mistral, unknown) keeps the
+# existing disjoint/additive treatment, matching Anthropic's confirmed
+# real API shape and this project's existing pricing formula, which
+# already prices cache_read/cache_creation as separate additive amounts.
+_INCLUSIVE_CACHE_PROVIDERS = frozenset({"openai"})
 
 
 def _provider_and_model(a: dict[str, Any]) -> tuple[str, str]:
@@ -79,33 +104,51 @@ def normalize_llm_call(span: RawSpan) -> LLMCall:
             "subset of output tokens"
         )
 
+    raw_input = _as_token_count(a.get("gen_ai.usage.input_tokens"), "gen_ai.usage.input_tokens")
+    cache_read = _as_token_count(
+        a.get("gen_ai.usage.cache_read.input_tokens"), "gen_ai.usage.cache_read.input_tokens"
+    )
+    cache_creation = _as_token_count(
+        a.get("gen_ai.usage.cache_creation.input_tokens"),
+        "gen_ai.usage.cache_creation.input_tokens",
+    )
+    if provider in _INCLUSIVE_CACHE_PROVIDERS:
+        if cache_read + cache_creation > raw_input:
+            raise AdapterError(
+                f"gen_ai.usage.cache_read.input_tokens + cache_creation.input_tokens "
+                f"({cache_read + cache_creation}) exceeds gen_ai.usage.input_tokens "
+                f"({raw_input}) for provider {provider!r} -- cache tokens must be a "
+                "subset of input tokens for this provider"
+            )
+        visible_input = raw_input - cache_read - cache_creation
+    else:
+        visible_input = raw_input
+
     usage = TokenUsage(
-        input=_as_token_count(a.get("gen_ai.usage.input_tokens"), "gen_ai.usage.input_tokens"),
+        input=visible_input,
         # Visible (non-reasoning) output only -- reasoning is billed at the
         # same output rate but tracked as its own TokenUsage field, so
         # subtracting it here keeps the two additive without double-billing
         # what the provider already counted once inside raw_output.
         output=raw_output - reasoning,
-        cache_read=_as_token_count(
-            a.get("gen_ai.usage.cache_read_input_tokens"), "gen_ai.usage.cache_read_input_tokens"
-        ),
-        cache_creation=_as_token_count(
-            a.get("gen_ai.usage.cache_creation_input_tokens"),
-            "gen_ai.usage.cache_creation_input_tokens",
-        ),
+        cache_read=cache_read,
+        cache_creation=cache_creation,
         reasoning=reasoning,
     )
-    return LLMCall(
-        span_id=span.span_id,
-        parent_id=span.parent_span_id,
-        provider=provider,
-        model=model,
-        usage=usage,
-        max_tokens=a.get("gen_ai.request.max_tokens"),
-        reasoning_effort=a.get("gen_ai.request.reasoning_effort"),
-        start_ns=span.start_ns,
-        end_ns=span.end_ns,
-    )
+    try:
+        return LLMCall(
+            span_id=span.span_id,
+            parent_id=span.parent_span_id,
+            provider=provider,
+            model=model,
+            usage=usage,
+            max_tokens=a.get("gen_ai.request.max_tokens"),
+            reasoning_effort=a.get("gen_ai.request.reasoning_effort"),
+            start_ns=span.start_ns,
+            end_ns=span.end_ns,
+        )
+    except ValidationError as exc:
+        raise AdapterError(f"malformed chat call attributes: {exc}") from exc
 
 
 def normalize_tool_call(span: RawSpan) -> ToolCall:

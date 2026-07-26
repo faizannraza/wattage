@@ -102,6 +102,19 @@ def test_quality_neutral_note_only_for_none_risk_findings() -> None:
     assert "quality-neutral" not in comment
 
 
+def test_headline_never_shows_a_misleading_zero_for_a_real_sub_cent_amount() -> None:
+    """The real bug this closes: the headline hardcoded `:.4f`, so a
+    genuinely nonzero recoverable amount below $0.00005 rendered as a
+    literal "$0.0000/run" -- immediately followed, one line down, by "Top
+    fix: ... ~$0.000036/run recoverable", a visible self-contradiction in
+    the same comment. format_dollars() already exists specifically to
+    prevent this."""
+    report = _report(100, "A", [_finding("redundant_tool_calls", 9, 0.000036)], 0.000036)
+    comment = render_pr_comment(report, Baseline())
+    assert "$0.0000/run" not in comment
+    assert "$0.000036/run" in comment
+
+
 def test_footer_reflects_quality_measured_state() -> None:
     unmeasured = render_pr_comment(_report(90, "A", [], 0.0, quality_measured=False), Baseline())
     assert "quality: unmeasured" in unmeasured

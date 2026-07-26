@@ -138,8 +138,72 @@ def test_failed_run_does_not_corrupt_the_baseline(tmp_path: Path) -> None:
             ),
         ),
         lambda tmp_path: _write(tmp_path / "not_an_object.json", json.dumps([1, 2, 3])),
+        lambda tmp_path: _write(
+            tmp_path / "non_numeric_token.json",
+            json.dumps(
+                {
+                    "resourceSpans": [
+                        {
+                            "scopeSpans": [
+                                {
+                                    "spans": [
+                                        {
+                                            "traceId": "t1",
+                                            "spanId": "s1",
+                                            "name": "chat",
+                                            "attributes": [
+                                                {
+                                                    "key": "gen_ai.usage.input_tokens",
+                                                    "value": {"stringValue": "abc"},
+                                                }
+                                            ],
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ),
+        ),
+        lambda tmp_path: _write(
+            tmp_path / "bad_max_tokens.json",
+            json.dumps(
+                {
+                    "resourceSpans": [
+                        {
+                            "scopeSpans": [
+                                {
+                                    "spans": [
+                                        {
+                                            "traceId": "t1",
+                                            "spanId": "s1",
+                                            "name": "chat",
+                                            "attributes": [
+                                                {
+                                                    "key": "gen_ai.request.max_tokens",
+                                                    "value": {"stringValue": "lots"},
+                                                }
+                                            ],
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ),
+        ),
     ],
-    ids=["missing-file", "malformed-json", "empty-trace", "span-missing-span-id", "not-an-object"],
+    ids=[
+        "missing-file",
+        "malformed-json",
+        "empty-trace",
+        "span-missing-span-id",
+        "not-an-object",
+        "non-numeric-token-value",
+        "malformed-max-tokens",
+    ],
 )
 def test_ingestion_errors_return_exit_code_3(tmp_path: Path, make_source: object) -> None:
     """A malformed trace (doc §11.3's exit code 3) must never surface as a
@@ -147,7 +211,9 @@ def test_ingestion_errors_return_exit_code_3(tmp_path: Path, make_source: object
     own contract reserves for "a fail-on threshold breached." A span
     missing 'spanId' used to raise a bare KeyError straight through run_ci,
     landing on Python's default uncaught-exception exit code (1) --
-    indistinguishable from a real cost regression."""
+    indistinguishable from a real cost regression. Non-numeric token values
+    and a malformed max_tokens field had the exact same gap: a bare
+    ValueError/pydantic ValidationError, uncaught."""
     source = make_source(tmp_path)  # type: ignore[operator]
     result = run_ci(source, baseline_path=str(tmp_path / "baseline.json"))
     assert result.exit_code == EXIT_INGESTION_ERROR
@@ -199,6 +265,59 @@ def test_corrupt_baseline_returns_exit_code_2_not_1(tmp_path: Path, make_baselin
     baseline_path = make_baseline(tmp_path)  # type: ignore[operator]
     result = run_ci(str(SAMPLE_TRACE), baseline_path=baseline_path)
     assert result.exit_code == EXIT_CONFIG_ERROR
+
+
+def test_malformed_pricing_override_yaml_returns_exit_code_2(tmp_path: Path) -> None:
+    """A malformed --pricing file is a config problem (same class as a bad
+    --config file), not a trace-ingestion one -- previously run_ci didn't
+    catch yaml.YAMLError at all (only report/score/badge did), so this fell
+    through to exit code 1."""
+    bad_pricing = tmp_path / "bad_pricing.yaml"
+    bad_pricing.write_text("not: valid: yaml: [")
+    result = run_ci(
+        str(SAMPLE_TRACE),
+        baseline_path=str(tmp_path / "baseline.json"),
+        pricing_override=str(bad_pricing),
+    )
+    assert result.exit_code == EXIT_CONFIG_ERROR
+
+
+def test_pricing_override_missing_required_field_returns_exit_code_2(tmp_path: Path) -> None:
+    incomplete_pricing = tmp_path / "incomplete.yaml"
+    incomplete_pricing.write_text(
+        "version: 'test'\nproviders:\n  anthropic:\n    claude-sonnet-4-6:\n      output: 15.0e-6\n"
+    )
+    result = run_ci(
+        str(SAMPLE_TRACE),
+        baseline_path=str(tmp_path / "baseline.json"),
+        pricing_override=str(incomplete_pricing),
+    )
+    assert result.exit_code == EXIT_CONFIG_ERROR
+
+
+@pytest.mark.parametrize(
+    "quality_content",
+    ['{"tasks": "not-an-object"}', '{"tasks": {"t1": {"eval_score": "high"}}}'],
+    ids=["tasks-not-an-object", "eval-score-not-numeric"],
+)
+def test_malformed_quality_map_returns_exit_code_2(tmp_path: Path, quality_content: str) -> None:
+    quality_path = tmp_path / "quality.json"
+    quality_path.write_text(quality_content)
+    result = run_ci(
+        str(SAMPLE_TRACE),
+        baseline_path=str(tmp_path / "baseline.json"),
+        quality_file=str(quality_path),
+    )
+    assert result.exit_code == EXIT_CONFIG_ERROR
+
+
+def test_parse_fail_on_rejects_unrecognized_clause_key() -> None:
+    """A typo'd --fail-on key (e.g. "score_belw") used to be silently
+    dropped, silently keeping the default threshold instead -- the same
+    "typo is silently ignored" failure mode as an unrecognized wattage.yaml
+    key."""
+    with pytest.raises(CIConfigError, match="unrecognized --fail-on key"):
+        parse_fail_on("score_belw:99")
 
 
 def test_unpriced_model_returns_exit_code_4(tmp_path: Path) -> None:

@@ -238,6 +238,9 @@ for i, q in enumerate(kb_queries):
         1800 if i == 0 else 0
     )  # attempt caching once, never redeemed (cache_read=0 always)
     output_tok = 1400 if i == len(kb_queries) - 1 else 90  # final answer is way too verbose
+    # input_tokens (600 fresh + cache_creation) is the raw wire value --
+    # inclusive of any cache_creation tokens, matching real OpenAI API
+    # behavior -- so the visible input normalize.py derives is always 600.
     spans.append(
         chat_span(
             f"esc-l{i}",
@@ -247,7 +250,7 @@ for i, q in enumerate(kb_queries):
             400_000_000,
             "openai",
             "gpt-5.6-luna",
-            600,
+            600 + cache_creation,
             output_tok,
             cache_creation=cache_creation,
         )

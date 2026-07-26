@@ -7,6 +7,79 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Cache tokens were double-billed for OpenAI-sourced calls, and could
+  trigger a false "enable prompt caching" recommendation.** Confirmed
+  against the OTel GenAI semconv registry and both providers' own docs:
+  OpenAI's `prompt_tokens` includes `cached_tokens` as a subset (same
+  convention as reasoning tokens), but Anthropic's real API reports
+  `input_tokens`/`cache_creation_input_tokens`/`cache_read_input_tokens`
+  as three genuinely separate, additive fields — the opposite convention.
+  `normalize.py` read cache tokens as independent additive quantities for
+  every provider, which was already correct for Anthropic but double-billed
+  every cache hit on an OpenAI-sourced call, and could make `prefix_churn`
+  recommend caching a trace that was already being cached correctly.
+  Fixed: input tokens are now split into visible input + cache tokens only
+  for providers confirmed to use the inclusive convention (currently just
+  `openai`); every other/unknown provider keeps the prior disjoint
+  treatment, matching Anthropic's confirmed real API shape. Also added the
+  official OTel attribute names (`gen_ai.usage.cache_read.input_tokens` /
+  `cache_creation.input_tokens`) as the canonical read, with the flat names
+  this project's own fixtures used as a fallback alias. One of this
+  project's own synthetic fixtures (`scenario1_customer_support.py`)
+  modeled an OpenAI cache-write call with the wrong (disjoint) convention;
+  rewritten to send the correct inclusive wire value and re-verified
+  end-to-end (total_dollars and every finding are unchanged).
+- **`wattage ci`'s exit-code contract had five more untested holes.** All
+  five reproduced and fixed: a non-numeric token count and a malformed
+  `max_tokens` field both raised bare Python exceptions inside
+  `normalize.py` (now raise `AdapterError`, mapping to exit 3); a malformed
+  `--pricing` YAML file passed to `ci` specifically was never caught
+  (`run_ci` now also catches `yaml.YAMLError`); a pricing override entry
+  missing `input`/`output` raised a bare `KeyError` (the registry now
+  validates and raises a new `PricingConfigError`); and two shapes of
+  malformed `--quality` map raised `AttributeError`/`TypeError` (quality
+  parsing now validates and raises a new `QualityMapError`). The latter
+  two new exception types map to exit code 2 (config/usage error, matching
+  `--config`'s own precedent), not exit 3 — pricing/quality overrides
+  aren't trace content. `report`/`score`/`badge`'s shared error handling
+  was extended to catch the same two new exception types.
+- **`--fail-on` silently dropped unrecognized clause keys**, the exact
+  same "typo is silently ignored" failure mode as the `wattage.yaml` fix
+  below — `--fail-on "score_belw:99"` parsed cleanly and silently kept the
+  default threshold instead. `parse_fail_on` now validates clause keys
+  against the three recognized ones and raises `CIConfigError` (exit 2)
+  for anything else.
+- **`wattage.yaml` silently ignored typo'd or unrecognized keys**,
+  directly contradicting `docs/configuration.md`'s own documented claim
+  that a schema violation is a hard error (exit code 2). pydantic's
+  default `extra="ignore"` behavior meant a misspelled key (e.g.
+  `expected_output_ceilling`, or a misspelled detector name) loaded with
+  no error and no warning, silently keeping every default untouched while
+  a user believed they'd configured something. Fixed: every config model
+  now inherits a shared `_StrictModel` base with `extra="forbid"`.
+- **JUnit XML broke on control characters in trace content.** XML 1.0
+  forbids most control characters outright (only tab/LF/CR are legal
+  below 0x20); `escape()`/`quoteattr()` handle `&`/`<`/`>`/`"` but never
+  touch raw control bytes, so a control character in finding evidence
+  (plausible — real tool output commonly contains ANSI escape sequences)
+  made the *entire* JUnit file fail to parse, not just corrupt one
+  element. Fixed: control characters are stripped from all trace-derived
+  text before it's written into the XML.
+- **Three surfaces still hardcoded `:.4f`/`.2f` for dollar amounts**,
+  bypassing the `format_dollars()` helper built specifically to prevent a
+  genuinely nonzero sub-cent amount from rendering as a literal
+  misleading `$0.0000`: the PR comment's headline (reproduced a comment
+  showing "$0.0000/run" immediately followed one line down by "~$0.000036/run
+  recoverable" — a visible self-contradiction), `wattage score`'s
+  headline, and the terminal report's total-cost line. All three now use
+  `format_dollars()`.
+- **`badge.py`'s docstring cited a nonexistent explanation.** It claimed
+  "see report.py's own note on why extrapolating ... would be dishonest"
+  for why `Score.monthly_projection` is never populated — no such note
+  exists in `report.py`. `monthly_projection` itself isn't broken (it's a
+  correctly-wired, tested extension point no current code path happens to
+  populate), so the docstring was corrected to describe that honestly
+  instead of citing a note that was never written.
 - **Two more pre-existing `GROUND_TRUTH.md` inaccuracies**, caught while
   re-deriving the reasoning-token numbers in the same file: scenario 2's
   it5 verbosity bait was documented as "1500 output tokens" (actual code

@@ -37,12 +37,12 @@ def test_negative_input_tokens_raises_instead_of_silently_subtracting_cost() -> 
     [
         "gen_ai.usage.input_tokens",
         "gen_ai.usage.output_tokens",
-        "gen_ai.usage.cache_read_input_tokens",
-        "gen_ai.usage.cache_creation_input_tokens",
-        # The canonical name normalize_llm_call reads directly -- the legacy
-        # flat "gen_ai.usage.reasoning_tokens" alias is only applied by the
-        # OTLP adapter's _apply_legacy_aliases, which this test bypasses by
-        # constructing a RawSpan directly.
+        # The canonical names normalize_llm_call reads directly -- the legacy
+        # flat aliases (gen_ai.usage.cache_read_input_tokens etc.) are only
+        # applied by the OTLP adapter's _apply_legacy_aliases, which this
+        # test bypasses by constructing a RawSpan directly.
+        "gen_ai.usage.cache_read.input_tokens",
+        "gen_ai.usage.cache_creation.input_tokens",
         "gen_ai.usage.reasoning.output_tokens",
     ],
 )
@@ -110,6 +110,62 @@ def test_no_reasoning_tokens_leaves_output_untouched() -> None:
     call = normalize_llm_call(span)
     assert call.usage.output == 150
     assert call.usage.reasoning == 0
+
+
+def test_openai_cache_tokens_are_split_out_of_the_raw_inclusive_input_count() -> None:
+    """The real bug this closes: confirmed against OpenAI's own docs that
+    prompt_tokens includes cached_tokens as a subset (same convention as
+    reasoning), but normalize.py read input_tokens/cache_read/
+    cache_creation as independent additive quantities for every provider,
+    double-billing every cache hit on an OpenAI-sourced call."""
+    span = _chat_span(
+        {
+            "gen_ai.provider.name": "openai",
+            "gen_ai.request.model": "gpt-5.6-luna",
+            "gen_ai.usage.input_tokens": 10400,
+            "gen_ai.usage.cache_read.input_tokens": 10200,
+            "gen_ai.usage.output_tokens": 100,
+        }
+    )
+    call = normalize_llm_call(span)
+    assert call.usage.input == 200
+    assert call.usage.cache_read == 10200
+    assert call.usage.input + call.usage.cache_read == 10400  # true provider-billed total
+
+
+def test_anthropic_cache_tokens_stay_disjoint_from_input() -> None:
+    """Anthropic's real API is the opposite of OpenAI's: input_tokens/
+    cache_creation_input_tokens/cache_read_input_tokens are three
+    genuinely separate, additive fields (confirmed against Anthropic's own
+    docs) -- this is what this project's pricing formula already assumed,
+    so an Anthropic-sourced call's input_tokens must NOT be treated as
+    inclusive of its cache tokens the way an OpenAI call's is."""
+    span = _chat_span(
+        {
+            "gen_ai.provider.name": "anthropic",
+            "gen_ai.request.model": "claude-sonnet-4-6",
+            "gen_ai.usage.input_tokens": 200,
+            "gen_ai.usage.cache_read.input_tokens": 10200,
+            "gen_ai.usage.output_tokens": 100,
+        }
+    )
+    call = normalize_llm_call(span)
+    assert call.usage.input == 200  # untouched, not subtracted
+    assert call.usage.cache_read == 10200
+
+
+def test_openai_cache_tokens_exceeding_raw_input_raises() -> None:
+    span = _chat_span(
+        {
+            "gen_ai.provider.name": "openai",
+            "gen_ai.request.model": "gpt-5.6-luna",
+            "gen_ai.usage.input_tokens": 100,
+            "gen_ai.usage.cache_read.input_tokens": 900,
+            "gen_ai.usage.output_tokens": 50,
+        }
+    )
+    with pytest.raises(AdapterError, match="exceeds"):
+        normalize_llm_call(span)
 
 
 def test_zero_and_absent_token_counts_are_unaffected() -> None:

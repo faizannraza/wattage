@@ -150,6 +150,85 @@ def test_score_command_prints_grade_and_headline() -> None:
     assert "recoverable" in result.stdout
 
 
+def test_score_command_never_shows_a_misleading_zero_for_a_real_sub_cent_amount(
+    tmp_path: Path,
+) -> None:
+    """The real bug this closes: the score command hardcoded `:.4f`, so a
+    genuinely nonzero recoverable amount below $0.00005 (mistral's cheap
+    pricing makes this common) printed as a literal "$0.0000 recoverable"
+    -- indistinguishable from "no waste at all". format_dollars() already
+    exists specifically to prevent this."""
+    trace_path = tmp_path / "subcent.json"
+    trace_path.write_text(
+        json.dumps(
+            {
+                "resourceSpans": [
+                    {
+                        "scopeSpans": [
+                            {
+                                "spans": [
+                                    {
+                                        "traceId": "t1",
+                                        "spanId": "s1",
+                                        "name": "chat mistral-small-latest",
+                                        "attributes": [
+                                            {
+                                                "key": "gen_ai.provider.name",
+                                                "value": {"stringValue": "mistral"},
+                                            },
+                                            {
+                                                "key": "gen_ai.request.model",
+                                                "value": {"stringValue": "mistral-small-latest"},
+                                            },
+                                            {
+                                                "key": "gen_ai.usage.input_tokens",
+                                                "value": {"intValue": "100"},
+                                            },
+                                            {
+                                                "key": "gen_ai.usage.output_tokens",
+                                                "value": {"intValue": "20"},
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        "traceId": "t1",
+                                        "spanId": "s2",
+                                        "name": "chat mistral-small-latest",
+                                        "attributes": [
+                                            {
+                                                "key": "gen_ai.provider.name",
+                                                "value": {"stringValue": "mistral"},
+                                            },
+                                            {
+                                                "key": "gen_ai.request.model",
+                                                "value": {"stringValue": "mistral-small-latest"},
+                                            },
+                                            {
+                                                "key": "gen_ai.usage.input_tokens",
+                                                "value": {"intValue": "120"},
+                                            },
+                                            {
+                                                "key": "gen_ai.usage.output_tokens",
+                                                "value": {"intValue": "20"},
+                                            },
+                                        ],
+                                    },
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        )
+    )
+
+    result = runner.invoke(app, ["score", str(trace_path)])
+
+    assert result.exit_code == 0
+    assert "$0.0000 recoverable" not in result.stdout
+    assert "recoverable" in result.stdout
+
+
 def test_score_command_shows_unpriced_not_a_fake_grade(tmp_path: Path) -> None:
     """A grade computed from an incomplete cost figure (an unknown model)
     must never print as a normal-looking "A (100)" -- that's exactly the

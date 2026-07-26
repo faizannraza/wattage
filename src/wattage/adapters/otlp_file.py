@@ -26,6 +26,14 @@ _LEGACY_MODEL_KEYS = ("llm.model", "openai.model")
 # the standardized name. Accepted as a fallback alongside it.
 _LEGACY_REASONING_KEYS = ("gen_ai.usage.reasoning_tokens",)
 
+# Same gap, for cache tokens: the official names are "gen_ai.usage.
+# cache_read.input_tokens" / "gen_ai.usage.cache_creation.input_tokens"
+# (same registry page); this project's own code used the flat
+# "gen_ai.usage.cache_read_input_tokens" / "..._cache_creation_input_tokens"
+# instead. Accepted as fallbacks alongside the canonical names.
+_LEGACY_CACHE_READ_KEYS = ("gen_ai.usage.cache_read_input_tokens",)
+_LEGACY_CACHE_CREATION_KEYS = ("gen_ai.usage.cache_creation_input_tokens",)
+
 _KIND_BY_OPERATION = {
     "chat": SpanKind.chat,
     # "call_llm" isn't a canonical semconv operation name, but it's what
@@ -79,6 +87,16 @@ def _apply_legacy_aliases(attrs: dict[str, Any]) -> dict[str, Any]:
         for legacy_key in _LEGACY_REASONING_KEYS:
             if legacy_key in attrs:
                 attrs["gen_ai.usage.reasoning.output_tokens"] = attrs[legacy_key]
+                break
+    if "gen_ai.usage.cache_read.input_tokens" not in attrs:
+        for legacy_key in _LEGACY_CACHE_READ_KEYS:
+            if legacy_key in attrs:
+                attrs["gen_ai.usage.cache_read.input_tokens"] = attrs[legacy_key]
+                break
+    if "gen_ai.usage.cache_creation.input_tokens" not in attrs:
+        for legacy_key in _LEGACY_CACHE_CREATION_KEYS:
+            if legacy_key in attrs:
+                attrs["gen_ai.usage.cache_creation.input_tokens"] = attrs[legacy_key]
                 break
     return attrs
 

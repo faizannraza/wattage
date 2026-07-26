@@ -88,3 +88,23 @@ def test_empty_file_returns_plain_defaults(tmp_path: Path) -> None:
     empty = tmp_path / "empty.yaml"
     empty.write_text("")
     assert load_config(str(empty)) == WattageConfig()
+
+
+def test_unrecognized_key_raises_clearly_instead_of_silently_ignored(tmp_path: Path) -> None:
+    """The real bug this closes: a typo'd key (e.g.
+    expected_output_ceilling, or a misspelled detector name like
+    cache_gapp) used to load with no error at all -- pydantic's default
+    extra="ignore" behavior -- silently keeping every default untouched
+    while the user believes they configured something. This directly
+    contradicted docs/configuration.md's own documented claim that a
+    schema violation is a hard error (exit code 2)."""
+    bad = tmp_path / "typo.yaml"
+    bad.write_text(
+        "detectors:\n"
+        "  verbosity:\n"
+        "    expected_output_ceilling: 5\n"
+        "  cache_gapp:\n"
+        "    enabled: false\n"
+    )
+    with pytest.raises(WattageConfigError, match="invalid config"):
+        load_config(str(bad))

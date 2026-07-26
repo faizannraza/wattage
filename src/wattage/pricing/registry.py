@@ -25,6 +25,13 @@ class UnknownModelError(LookupError):
     """No registry entry for (provider, model); the caller must warn, not guess."""
 
 
+class PricingConfigError(Exception):
+    """A pricing.yaml (vendored or --pricing override) model entry exists
+    but is missing required fields. Maps to exit code 2 (config/usage
+    error), not the ingestion-error path -- pricing data isn't trace
+    content."""
+
+
 class PricingRegistry:
     def __init__(self, providers: dict[str, dict[str, Any]], version: str) -> None:
         self._providers = providers
@@ -65,6 +72,12 @@ class PricingRegistry:
         if provider_models is None or model not in provider_models:
             raise UnknownModelError(f"No pricing entry for {provider}/{model}")
         m = provider_models[model]
+        missing = [key for key in ("input", "output") if key not in m]
+        if missing:
+            raise PricingConfigError(
+                f"pricing entry for {provider}/{model} is missing required "
+                f"field(s): {', '.join(missing)}"
+            )
         return ModelPrice(
             input=m["input"],
             output=m["output"],

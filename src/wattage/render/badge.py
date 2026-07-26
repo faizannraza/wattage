@@ -8,8 +8,12 @@ layout engine available outside a browser, which is what every static
 badge generator does.
 
 Shows "~$X/mo recoverable" only when Score.monthly_projection is actually
-populated (it isn't yet — see report.py's own note on why extrapolating
-from one trace's wall-clock duration would be dishonest); otherwise shows
+populated. No current code path sets it — build_report/compute_score never
+pass a value, so it's always None in every real run today — because
+extrapolating a monthly figure from one trace's cost would require
+guessing at run frequency this project doesn't have real data for. It
+exists as a ready extension point for a future feature (e.g. an explicit
+--runs-per-month input) rather than a guess; until then this always shows
 the per-run recoverable-dollars figure, never a fabricated monthly claim.
 
 When any call couldn't be priced, the badge shows "unpriced" in a neutral

@@ -6,21 +6,33 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 
-class PrefixChurnConfig(BaseModel):
+class _StrictModel(BaseModel):
+    """A typo'd or unrecognized key in wattage.yaml must be a hard error,
+    not silently ignored -- pydantic's own default (extra="ignore") would
+    otherwise let a user believe they've overridden a threshold (e.g.
+    ci.fail_on.score_below misspelled) while every command quietly keeps
+    running on the untouched default, exactly the "silently plausible
+    wrong behavior" this project exists to avoid. Every config model
+    below inherits this instead of BaseModel directly."""
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class PrefixChurnConfig(_StrictModel):
     enabled: bool = True
     # A finding's severity is "high" once its share of the task's total cost
     # crosses this ratio (doc §4.1: "severity from resent_dollars/session_dollars").
     high_severity_ratio: float = 0.30
 
 
-class CacheGapConfig(BaseModel):
+class CacheGapConfig(_StrictModel):
     enabled: bool = True
 
 
-class VerbosityConfig(BaseModel):
+class VerbosityConfig(_StrictModel):
     enabled: bool = True
     # Calls with no max_tokens cap that generate more than this many output
     # tokens are flagged. A single global ceiling, not doc §9.6's per-task-type
@@ -30,14 +42,14 @@ class VerbosityConfig(BaseModel):
     high_severity_multiplier: float = 3.0
 
 
-class RedundantToolCallsConfig(BaseModel):
+class RedundantToolCallsConfig(_StrictModel):
     enabled: bool = True
     window: int = 5
     fuzzy: bool = True
     exempt_tools: list[str] = Field(default_factory=lambda: ["poll_status", "wait", "healthcheck"])
 
 
-class ConvergenceWeightsConfig(BaseModel):
+class ConvergenceWeightsConfig(_StrictModel):
     """Field names match doc §5.3's notation (E/S/P/O/G) exactly, on purpose."""
 
     E: float = 0.40
@@ -47,7 +59,7 @@ class ConvergenceWeightsConfig(BaseModel):
     G: float = 0.05
 
 
-class NonConvergenceConfig(BaseModel):
+class NonConvergenceConfig(_StrictModel):
     enabled: bool = True
     min_iterations: int = 3
     theta_prog: float = 0.25
@@ -64,13 +76,13 @@ class NonConvergenceConfig(BaseModel):
     judge: str = "off"
 
 
-class RetrievalThrashConfig(BaseModel):
+class RetrievalThrashConfig(_StrictModel):
     enabled: bool = True
     relevance_threshold: float = 0.35
     max_iterations_soft: int = 4
 
 
-class ModelMismatchConfig(BaseModel):
+class ModelMismatchConfig(_StrictModel):
     enabled: bool = True
     # provider -> candidate model id, defaulting to the vendored registry's
     # cheapest known model per provider (doc §9.6's "[haiku-class]").
@@ -87,13 +99,13 @@ class ModelMismatchConfig(BaseModel):
     min_downgrade_pass_rate: float = 0.90
 
 
-class ReasoningOverspendConfig(BaseModel):
+class ReasoningOverspendConfig(_StrictModel):
     enabled: bool = True
     expected_reasoning_ceiling: int = 500
     simple_output_ceiling: int = 150
 
 
-class DetectorsConfig(BaseModel):
+class DetectorsConfig(_StrictModel):
     prefix_churn: PrefixChurnConfig = Field(default_factory=PrefixChurnConfig)
     cache_gap: CacheGapConfig = Field(default_factory=CacheGapConfig)
     verbosity: VerbosityConfig = Field(default_factory=VerbosityConfig)
@@ -104,17 +116,17 @@ class DetectorsConfig(BaseModel):
     reasoning_overspend: ReasoningOverspendConfig = Field(default_factory=ReasoningOverspendConfig)
 
 
-class QualityConfig(BaseModel):
+class QualityConfig(_StrictModel):
     target: float = 0.90
 
 
-class CIFailOnConfig(BaseModel):
+class CIFailOnConfig(_StrictModel):
     score_below: int | None = 80
     cost_delta_pct_above: float | None = 5.0
     any_critical: bool = True
 
 
-class CIConfig(BaseModel):
+class CIConfig(_StrictModel):
     baseline_path: str = ".wattage/baseline.json"
     rolling_window_days: int = 7
     fail_on: CIFailOnConfig = Field(default_factory=CIFailOnConfig)
@@ -126,7 +138,7 @@ class CIConfig(BaseModel):
     pr_comment_out: str | None = None
 
 
-class WattageConfig(BaseModel):
+class WattageConfig(_StrictModel):
     detectors: DetectorsConfig = Field(default_factory=DetectorsConfig)
     quality: QualityConfig = Field(default_factory=QualityConfig)
     ci: CIConfig = Field(default_factory=CIConfig)

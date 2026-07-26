@@ -10,7 +10,9 @@ from wattage import __version__
 from wattage.adapters.base import AdapterError
 from wattage.ci import CIConfigError, parse_fail_on, run_ci
 from wattage.config import WattageConfig, WattageConfigError, load_config
+from wattage.pricing.registry import PricingConfigError
 from wattage.render.badge import render_badge
+from wattage.render.format import format_dollars
 from wattage.render.html import render_html
 from wattage.render.json_report import render_json
 from wattage.render.junit import render_junit
@@ -18,6 +20,7 @@ from wattage.render.pr_comment import render_pr_comment
 from wattage.render.sarif import render_sarif
 from wattage.render.terminal import render_terminal
 from wattage.report import build_report, build_trace_and_report
+from wattage.scoring.quality import QualityMapError
 
 app = typer.Typer(
     name="wattage",
@@ -55,7 +58,14 @@ def _input_errors_or_exit(build: Callable[[], _T]) -> _T:
     """
     try:
         return build()
-    except (OSError, json.JSONDecodeError, yaml.YAMLError, AdapterError) as exc:
+    except (
+        OSError,
+        json.JSONDecodeError,
+        yaml.YAMLError,
+        AdapterError,
+        PricingConfigError,
+        QualityMapError,
+    ) as exc:
         typer.echo(f"error: {exc}", err=True)
         raise typer.Exit(code=1) from exc
 
@@ -147,7 +157,7 @@ def score(
         )
         return
     s = report_obj.score
-    typer.echo(f"{s.grade} ({s.efficiency}) · ${s.recoverable_dollars:.4f} recoverable")
+    typer.echo(f"{s.grade} ({s.efficiency}) · {format_dollars(s.recoverable_dollars)} recoverable")
 
 
 @app.command()

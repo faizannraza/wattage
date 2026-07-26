@@ -5,11 +5,23 @@ wattage results natively without needing GitHub-specific integration.
 
 from __future__ import annotations
 
+import re
 from xml.sax.saxutils import escape, quoteattr
 
 from wattage.models import Report, Severity
 
 _FAILING_SEVERITIES = {Severity.high, Severity.critical}
+
+# XML 1.0 forbids these control characters outright (tab/LF/CR are the only
+# ones under 0x20 that are legal) -- quoteattr()/escape() only handle &/</>/"
+# and never touch raw bytes, so a control character surviving in trace
+# content (e.g. an ANSI escape sequence in a tool name/result) would make
+# the whole file fail to parse, not just corrupt one element.
+_ILLEGAL_XML_CHARS_RE = re.compile("[\x00-\x08\x0b\x0c\x0e-\x1f]")
+
+
+def _sanitize(text: str) -> str:
+    return _ILLEGAL_XML_CHARS_RE.sub("", text)
 
 
 def render_junit(report: Report, ci_reasons: list[str] | None = None) -> str:
@@ -25,7 +37,7 @@ def render_junit(report: Report, ci_reasons: list[str] | None = None) -> str:
 
     gate_name = quoteattr(f"Token Efficiency: {report.score.grade} ({report.score.efficiency})")
     if ci_reasons:
-        message_text = "; ".join(ci_reasons)
+        message_text = _sanitize("; ".join(ci_reasons))
         message_attr = quoteattr(message_text)
         testcases.append(
             f'<testcase classname="wattage.ci_gate" name={gate_name}>'
@@ -35,10 +47,10 @@ def render_junit(report: Report, ci_reasons: list[str] | None = None) -> str:
         testcases.append(f'<testcase classname="wattage.ci_gate" name={gate_name}/>')
 
     for i, finding in enumerate(report.findings):
-        name = quoteattr(f"{finding.id}[{i}]: {finding.evidence[:80]}")
+        name = quoteattr(_sanitize(f"{finding.id}[{i}]: {finding.evidence[:80]}"))
         classname = f"wattage.{finding.id}"
         if finding.severity in _FAILING_SEVERITIES:
-            message_text = f"${finding.wasted_dollars:.4f} wasted — {finding.fix}"
+            message_text = _sanitize(f"${finding.wasted_dollars:.4f} wasted — {finding.fix}")
             message_attr = quoteattr(message_text)
             testcases.append(
                 f'<testcase classname="{classname}" name={name}>'

@@ -112,3 +112,27 @@ def test_double_quotes_in_evidence_and_fix_text_do_not_break_the_xml() -> None:
     )
     assert '"quoted"' in finding_case.get("name")
     assert '"weird"' in finding_case.find("failure").get("message")
+
+
+def test_control_characters_in_trace_content_do_not_break_the_xml() -> None:
+    """The real bug this closes: XML 1.0 forbids most control characters
+    outright (only tab/LF/CR are legal below 0x20). escape()/quoteattr()
+    only handle &/</>/" and never touch raw control bytes, so a control
+    character surviving in trace content -- real tool output commonly
+    contains ANSI escape sequences -- made the *entire* JUnit file fail to
+    parse, not just corrupt one element."""
+    finding = Finding(
+        id="redundant_tool_calls",
+        severity=Severity.high,
+        wasted_tokens=10,
+        wasted_dollars=1.23,
+        quality_risk=QualityRisk.none,
+        evidence="tool call with a bell char: \x07 here",
+        fix="do the fix",
+    )
+    report = _report([finding])
+
+    xml_str = render_junit(report)
+
+    ET.fromstring(xml_str)  # raises on invalid XML
+    assert "\x07" not in xml_str

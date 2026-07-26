@@ -119,6 +119,34 @@ def test_canonical_reasoning_tokens_attribute_wins_over_legacy(tmp_path: Path) -
     assert spans[0].attributes["gen_ai.usage.reasoning.output_tokens"] == 42
 
 
+def test_legacy_flat_cache_token_attributes_map_to_canonical_names(tmp_path: Path) -> None:
+    """Same gap as reasoning tokens, for cache tokens: the official OTel
+    names are gen_ai.usage.cache_read.input_tokens /
+    cache_creation.input_tokens (dotted); this project's own code used the
+    flat gen_ai.usage.cache_read_input_tokens / cache_creation_input_tokens
+    instead. Accepted as fallbacks alongside the canonical names."""
+    path = _write_otlp(
+        tmp_path,
+        [
+            {
+                "traceId": "t1",
+                "spanId": "s1",
+                "name": "chat",
+                "attributes": [
+                    {"key": "gen_ai.usage.cache_read_input_tokens", "value": {"intValue": "10"}},
+                    {
+                        "key": "gen_ai.usage.cache_creation_input_tokens",
+                        "value": {"intValue": "20"},
+                    },
+                ],
+            }
+        ],
+    )
+    spans = list(OTLPFileAdapter().read(str(path)))
+    assert spans[0].attributes["gen_ai.usage.cache_read.input_tokens"] == 10
+    assert spans[0].attributes["gen_ai.usage.cache_creation.input_tokens"] == 20
+
+
 def test_canonical_model_attribute_wins_over_legacy(tmp_path: Path) -> None:
     path = _write_otlp(
         tmp_path,

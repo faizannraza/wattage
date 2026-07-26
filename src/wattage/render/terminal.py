@@ -27,7 +27,7 @@ def render_terminal(report: Report, console: Console | None = None) -> None:
 
     headline = (
         f"[bold]Token Efficiency:[/bold] {report.score.grade} ({report.score.efficiency})"
-        f"   [bold]Total cost:[/bold] ${report.total_dollars:.4f}"
+        f"   [bold]Total cost:[/bold] {format_dollars(report.total_dollars)}"
     )
     if not report.score.quality_measured:
         headline += "\n[dim]quality: unmeasured[/dim]"
