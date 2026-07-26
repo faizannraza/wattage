@@ -342,6 +342,23 @@ def test_missing_source_file_is_a_clean_error_not_a_traceback(command: str, tmp_
     assert not isinstance(result.exception, FileNotFoundError)
 
 
+@pytest.mark.parametrize("command", ["report", "score", "badge"])
+def test_empty_trace_is_a_clean_error_not_a_confident_fake_grade(
+    command: str, tmp_path: Path
+) -> None:
+    """A trace with zero sessions used to render a perfectly normal-looking
+    "A (100)"/"this trace looks efficient" -- exactly the kind of
+    plausible-but-vacuous number this project exists to avoid. Must now be
+    a clean error, matching how `ci` already treats an empty trace."""
+    empty_path = tmp_path / "empty.json"
+    empty_path.write_text(json.dumps({"resourceSpans": []}))
+
+    result = runner.invoke(app, [command, str(empty_path)])
+
+    assert result.exit_code == 1
+    assert "A (100)" not in result.stdout
+
+
 def test_malformed_trace_via_report_is_a_clean_error_not_a_traceback(tmp_path: Path) -> None:
     trace_path = tmp_path / "missing_span_id.json"
     trace_path.write_text(

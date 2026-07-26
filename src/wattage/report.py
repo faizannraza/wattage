@@ -6,6 +6,7 @@ import json
 from datetime import datetime, timezone
 from typing import Any
 
+from wattage.adapters.base import AdapterError
 from wattage.adapters.otlp_file import OTLPFileAdapter
 from wattage.config import WattageConfig
 from wattage.convergence.embed import build_embedder
@@ -53,6 +54,15 @@ def build_trace_and_report(
     adapter = OTLPFileAdapter()
     raw_spans = list(adapter.read(source))
     trace = sessionize(raw_spans, source=source)
+    if not trace.sessions:
+        # An empty trace produced zero real data to grade -- a confident
+        # "A (100) / this trace looks efficient" here would be exactly the
+        # plausible-looking-but-vacuous number this project exists to
+        # avoid. `wattage ci` already treated this as an ingestion error;
+        # raising it here means every caller (report/score/badge/ci) gets
+        # the same treatment from one place instead of duplicating the
+        # check.
+        raise AdapterError(f"'{source}' produced zero sessions (empty or unparseable trace)")
 
     registry = PricingRegistry.load(overrides_path=pricing_override)
     engine = PricingEngine(registry)

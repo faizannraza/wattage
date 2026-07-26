@@ -122,13 +122,12 @@ def run_ci(
             quality_file=quality_file,
         )
     except (OSError, json.JSONDecodeError, AdapterError) as exc:
+        # AdapterError also covers a structurally-valid but empty trace
+        # (zero sessions) -- build_trace_and_report raises it for that
+        # case itself now, so there's exactly one place that decides what
+        # counts as "nothing to grade" instead of two copies that could
+        # drift apart.
         return CIResult(exit_code=EXIT_INGESTION_ERROR, reasons=[str(exc)])
-
-    if not trace.sessions:
-        return CIResult(
-            exit_code=EXIT_INGESTION_ERROR,
-            reasons=[f"'{source}' produced zero sessions (empty or unparseable trace)"],
-        )
 
     if report.unpriced_calls > 0:
         models = ", ".join(report.unpriced_models)

@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from wattage.adapters.base import AdapterError
 from wattage.report import build_report
 
 
@@ -183,3 +184,18 @@ def test_unpriced_calls_are_counted_and_named_without_corrupting_priced_totals(
     # total_dollars reflects only the priced call (1000*3e-6 + 100*15e-6),
     # never a guessed rate for the unpriced one.
     assert report.total_dollars == pytest.approx(1000 * 3.0e-6 + 100 * 15.0e-6)
+
+
+def test_empty_trace_raises_instead_of_a_vacuous_confident_grade(tmp_path: Path) -> None:
+    """The real bug this closes: a trace with zero sessions used to build a
+    perfectly normal-looking Report -- "A (100)", "$0.0000", "this trace
+    looks efficient" -- when nothing was actually analyzed. wattage ci
+    already treated this as an ingestion error; build_trace_and_report now
+    raises the same AdapterError itself, so report/score/badge (which
+    don't have ci's exit-code contract but reuse this same ingestion path)
+    get a clear error instead of a fake grade."""
+    path = tmp_path / "empty.json"
+    path.write_text(json.dumps({"resourceSpans": []}))
+
+    with pytest.raises(AdapterError, match="zero sessions"):
+        build_report(str(path))

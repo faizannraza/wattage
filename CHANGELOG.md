@@ -7,6 +7,18 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **An empty trace rendered a confident, fake "A (100)" grade.** A trace
+  with zero sessions (e.g. `{"resourceSpans": []}`) built a perfectly
+  normal-looking `Report` — "A (100)", "$0.0000", "this trace looks
+  efficient" — via `report`/`score`/`badge`, even though nothing was
+  actually analyzed. `wattage ci` already treated an empty trace as an
+  ingestion error (exit 3), but that check lived only in `ci.py`,
+  duplicating logic the other three commands never had. Fixed at the
+  source: `build_trace_and_report` itself now raises `AdapterError` for
+  zero sessions, so every caller gets the same treatment from one place —
+  `ci.py`'s now-redundant manual check was removed, and `report`/`score`/
+  `badge` get a clean error via the `_input_errors_or_exit` handling
+  added for the previous fix, instead of a vacuous grade.
 - **`report`/`score`/`badge` dumped raw Python tracebacks for ordinary
   input errors.** Unlike `wattage ci`, these three commands caught nothing
   around ingestion — a missing or malformed `--source` trace, a malformed
