@@ -77,6 +77,26 @@ def test_efficiency_never_goes_below_zero_or_above_hundred() -> None:
     assert zero_cost.efficiency == 100
 
 
+def test_recoverable_dollars_never_exceeds_total_dollars() -> None:
+    """Two detectors can legitimately flag the same underlying calls from
+    different angles (prefix_churn + nonconvergence on a stalled loop is a
+    real, reproduced case, not hypothetical) — a naive sum across findings
+    can then exceed the trace's own total cost, which is a nonsensical
+    claim ("recover more than you spent"). recoverable_dollars must be
+    capped at total_dollars rather than reporting the raw, possibly
+    double-counted sum.
+    """
+    findings = [_finding(7.0), _finding(6.0)]  # sums to 13.0, overlapping-detector shape
+    score = compute_score(findings=findings, total_dollars=10.0)
+
+    assert score.recoverable_dollars == pytest.approx(10.0)
+
+
+def test_recoverable_dollars_is_zero_when_total_dollars_is_zero() -> None:
+    score = compute_score(findings=[_finding(5.0)], total_dollars=0.0)
+    assert score.recoverable_dollars == 0.0
+
+
 def test_quality_factor_placeholder_is_honest_about_being_unmeasured() -> None:
     assert compute_quality_factor(None) == (1.0, False)
     assert compute_quality_factor({"tasks": {}}) == (1.0, False)
