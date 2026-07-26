@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 
+from wattage.adapters.base import AdapterError
 from wattage.baseline import (
     Baseline,
     cost_delta_pct,
@@ -118,7 +119,7 @@ def run_ci(
             config=config,
             quality_file=quality_file,
         )
-    except (OSError, json.JSONDecodeError) as exc:
+    except (OSError, json.JSONDecodeError, AdapterError) as exc:
         return CIResult(exit_code=EXIT_INGESTION_ERROR, reasons=[str(exc)])
 
     if not trace.sessions:

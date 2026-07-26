@@ -9,6 +9,13 @@ from typing import IO
 from wattage.models import RawSpan
 
 
+class AdapterError(Exception):
+    """A trace source was structurally malformed -- the source itself is
+    broken, not the code reading it. Adapters raise this for missing
+    required fields or an unexpected shape, so callers (`wattage ci` in
+    particular) can tell a bad trace apart from a real bug."""
+
+
 class Adapter(ABC):
     @abstractmethod
     def read(self, source: str | IO[str]) -> Iterable[RawSpan]: ...

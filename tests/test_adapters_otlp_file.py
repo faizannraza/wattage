@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+import pytest
+
+from wattage.adapters.base import AdapterError
 from wattage.adapters.otlp_file import OTLPFileAdapter
 from wattage.models import SpanKind
 
@@ -100,3 +103,30 @@ def test_classifies_kind_from_span_name_when_operation_attribute_absent(tmp_path
     )
     spans = list(OTLPFileAdapter().read(str(path)))
     assert spans[0].kind == SpanKind.execute_tool
+
+
+def test_span_missing_span_id_raises_adapter_error_not_a_bare_key_error(tmp_path: Path) -> None:
+    """The real bug this closes: a span missing 'spanId' used to raise a
+    bare KeyError straight out of the adapter, which `wattage ci` didn't
+    catch -- it fell through as an uncaught exception (Python's default
+    exit code 1), indistinguishable from exit code 1's real meaning ("a
+    fail-on threshold breached"), instead of the documented exit code 3
+    ("ingestion error"). AdapterError is what ci.py now catches."""
+    path = _write_otlp(tmp_path, [{"traceId": "t1", "name": "chat", "attributes": []}])
+    with pytest.raises(AdapterError, match="spanId"):
+        list(OTLPFileAdapter().read(str(path)))
+
+
+def test_non_dict_span_entry_raises_adapter_error(tmp_path: Path) -> None:
+    payload = {"resourceSpans": [{"scopeSpans": [{"spans": "not-a-list-of-objects"}]}]}
+    path = tmp_path / "trace.json"
+    path.write_text(json.dumps(payload))
+    with pytest.raises(AdapterError):
+        list(OTLPFileAdapter().read(str(path)))
+
+
+def test_non_object_top_level_json_raises_adapter_error(tmp_path: Path) -> None:
+    path = tmp_path / "trace.json"
+    path.write_text(json.dumps([1, 2, 3]))
+    with pytest.raises(AdapterError, match="top-level JSON must be an object"):
+        list(OTLPFileAdapter().read(str(path)))

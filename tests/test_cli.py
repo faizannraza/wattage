@@ -392,6 +392,29 @@ def test_ci_command_config_error_exit_code(tmp_path: Path) -> None:
     assert result.exit_code == 2
 
 
+def test_ci_command_malformed_trace_is_a_clean_exit_code_3_not_an_uncaught_crash(
+    tmp_path: Path,
+) -> None:
+    """A span missing 'spanId' used to blow up run_ci with a bare KeyError,
+    which typer/Click renders as an uncaught-exception traceback and Python's
+    default exit code 1 -- indistinguishable, at the CLI boundary, from a
+    real cost regression (also exit code 1). Must be a clean exit code 3."""
+    trace_path = tmp_path / "missing_span_id.json"
+    trace_path.write_text(
+        json.dumps(
+            {"resourceSpans": [{"scopeSpans": [{"spans": [{"traceId": "t1", "name": "chat"}]}]}]}
+        )
+    )
+
+    result = runner.invoke(
+        app,
+        ["ci", str(trace_path), "--baseline", str(tmp_path / "baseline.json")],
+    )
+
+    assert result.exit_code == 3
+    assert not isinstance(result.exception, KeyError)
+
+
 def test_ci_command_writes_pr_comment_sarif_and_junit_outputs(tmp_path: Path) -> None:
     pr_comment_path = tmp_path / "pr_comment.md"
     sarif_path = tmp_path / "wattage.sarif"

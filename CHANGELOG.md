@@ -7,6 +7,19 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **A malformed trace could break `wattage ci`'s exit-code contract.** A
+  span missing its required `spanId` field (or any other structurally
+  malformed span — a non-object entry, a trace whose top-level JSON wasn't
+  even an object) raised a bare `KeyError`/`TypeError`/`AttributeError`
+  straight out of the OTLP adapter, which `run_ci` didn't catch. That
+  surfaced as an uncaught-exception traceback and Python's default exit
+  code 1 — indistinguishable, at the CI-gate boundary, from exit code 1's
+  actual documented meaning ("a fail-on threshold breached," i.e. a real
+  cost regression). A bad trace could look exactly like a passing build
+  failing its cost gate. Fixed: the adapter now raises a dedicated
+  `AdapterError` for any malformed span or trace shape, and `run_ci` maps
+  it to the already-documented exit code 3 ("ingestion error"), alongside
+  the existing missing-file/invalid-JSON/empty-trace cases.
 - **`wattage.yaml` didn't actually exist as a load path.** `config.py`'s own
   docstring called itself "wattage.yaml config schema" and CONTRIBUTING.md
   told detector authors a user could turn a detector off "in wattage.yaml,"

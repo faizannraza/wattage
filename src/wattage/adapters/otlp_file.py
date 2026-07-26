@@ -10,7 +10,7 @@ import json
 from collections.abc import Iterable
 from typing import IO, Any
 
-from wattage.adapters.base import Adapter
+from wattage.adapters.base import Adapter, AdapterError
 from wattage.models import RawSpan, SpanKind
 
 # gen_ai.* is the canonical attribute namespace (OTel GenAI semconv). Older
@@ -87,37 +87,59 @@ class OTLPFileAdapter(Adapter):
 
     def read(self, source: str | IO[str]) -> Iterable[RawSpan]:
         payload = self._load(source)
-        for resource_span in payload.get("resourceSpans", []):
-            for scope_span in resource_span.get("scopeSpans", []):
-                for span in scope_span.get("spans", []):
-                    yield self._to_raw_span(span)
+        try:
+            for resource_span in payload.get("resourceSpans", []):
+                for scope_span in resource_span.get("scopeSpans", []):
+                    for span in scope_span.get("spans", []):
+                        yield self._to_raw_span(span)
+        except AttributeError as exc:
+            # resourceSpans/scopeSpans/spans is supposed to be a list of
+            # objects; a non-object entry (e.g. a stray string) fails its
+            # own .get() call here, one level up from _to_raw_span's per-
+            # span validation below.
+            raise AdapterError(f"malformed trace: {exc}") from exc
 
     @staticmethod
     def _load(source: str | IO[str]) -> dict[str, Any]:
         if isinstance(source, str):
             with open(source, encoding="utf-8") as f:
-                return dict(json.load(f))
-        return dict(json.load(source))
+                raw = json.load(f)
+        else:
+            raw = json.load(source)
+        if not isinstance(raw, dict):
+            raise AdapterError(
+                f"malformed trace: top-level JSON must be an object, got {type(raw).__name__}"
+            )
+        return raw
 
     @staticmethod
     def _to_raw_span(span: dict[str, Any]) -> RawSpan:
-        attrs = _apply_legacy_aliases(_decode_attributes(span.get("attributes", [])))
-        events = [
-            {
-                "name": event.get("name", ""),
-                "attributes": _decode_attributes(event.get("attributes", [])),
-            }
-            for event in span.get("events", [])
-        ]
-        name = span.get("name", "")
-        return RawSpan(
-            span_id=span["spanId"],
-            parent_span_id=span.get("parentSpanId") or None,
-            trace_id=span.get("traceId"),
-            name=name,
-            kind=_classify_kind(attrs, name),
-            attributes=attrs,
-            start_ns=int(span.get("startTimeUnixNano", 0)),
-            end_ns=int(span.get("endTimeUnixNano", 0)),
-            events=events,
-        )
+        # This is the OTLP-JSON/untrusted-input boundary -- a hand-edited or
+        # corrupted trace can be malformed in arbitrarily many ways here, and
+        # every one of them should read as a bad trace (AdapterError -> `wattage
+        # ci` exit 3), not an unhandled traceback masquerading as exit 1 "cost
+        # regression detected".
+        try:
+            span_id = span["spanId"]
+            attrs = _apply_legacy_aliases(_decode_attributes(span.get("attributes", [])))
+            events = [
+                {
+                    "name": event.get("name", ""),
+                    "attributes": _decode_attributes(event.get("attributes", [])),
+                }
+                for event in span.get("events", [])
+            ]
+            name = span.get("name", "")
+            return RawSpan(
+                span_id=span_id,
+                parent_span_id=span.get("parentSpanId") or None,
+                trace_id=span.get("traceId"),
+                name=name,
+                kind=_classify_kind(attrs, name),
+                attributes=attrs,
+                start_ns=int(span.get("startTimeUnixNano", 0)),
+                end_ns=int(span.get("endTimeUnixNano", 0)),
+                events=events,
+            )
+        except (KeyError, TypeError, AttributeError, ValueError) as exc:
+            raise AdapterError(f"malformed span in trace: {exc}") from exc

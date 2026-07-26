@@ -127,10 +127,27 @@ def test_failed_run_does_not_corrupt_the_baseline(tmp_path: Path) -> None:
         lambda tmp_path: str(tmp_path / "does-not-exist.json"),
         lambda tmp_path: _write(tmp_path / "bad.json", "not json"),
         lambda tmp_path: _write(tmp_path / "empty.json", json.dumps({"resourceSpans": []})),
+        lambda tmp_path: _write(
+            tmp_path / "missing_span_id.json",
+            json.dumps(
+                {
+                    "resourceSpans": [
+                        {"scopeSpans": [{"spans": [{"traceId": "t1", "name": "chat"}]}]}
+                    ]
+                }
+            ),
+        ),
+        lambda tmp_path: _write(tmp_path / "not_an_object.json", json.dumps([1, 2, 3])),
     ],
-    ids=["missing-file", "malformed-json", "empty-trace"],
+    ids=["missing-file", "malformed-json", "empty-trace", "span-missing-span-id", "not-an-object"],
 )
 def test_ingestion_errors_return_exit_code_3(tmp_path: Path, make_source: object) -> None:
+    """A malformed trace (doc §11.3's exit code 3) must never surface as a
+    different exit code -- in particular, not exit code 1, which the doc's
+    own contract reserves for "a fail-on threshold breached." A span
+    missing 'spanId' used to raise a bare KeyError straight through run_ci,
+    landing on Python's default uncaught-exception exit code (1) --
+    indistinguishable from a real cost regression."""
     source = make_source(tmp_path)  # type: ignore[operator]
     result = run_ci(source, baseline_path=str(tmp_path / "baseline.json"))
     assert result.exit_code == EXIT_INGESTION_ERROR
