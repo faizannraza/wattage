@@ -19,6 +19,13 @@ from wattage.models import RawSpan, SpanKind
 # ever has to look in one place.
 _LEGACY_MODEL_KEYS = ("llm.model", "openai.model")
 
+# The official OTel GenAI semconv attribute is "gen_ai.usage.reasoning.
+# output_tokens" (registry: opentelemetry.io/docs/specs/semconv/registry/
+# attributes/gen-ai/) -- this project's own synthetic fixtures and earlier
+# code used the flat "gen_ai.usage.reasoning_tokens" instead, which isn't
+# the standardized name. Accepted as a fallback alongside it.
+_LEGACY_REASONING_KEYS = ("gen_ai.usage.reasoning_tokens",)
+
 _KIND_BY_OPERATION = {
     "chat": SpanKind.chat,
     # "call_llm" isn't a canonical semconv operation name, but it's what
@@ -67,6 +74,11 @@ def _apply_legacy_aliases(attrs: dict[str, Any]) -> dict[str, Any]:
         for legacy_key in _LEGACY_MODEL_KEYS:
             if legacy_key in attrs:
                 attrs["gen_ai.request.model"] = attrs[legacy_key]
+                break
+    if "gen_ai.usage.reasoning.output_tokens" not in attrs:
+        for legacy_key in _LEGACY_REASONING_KEYS:
+            if legacy_key in attrs:
+                attrs["gen_ai.usage.reasoning.output_tokens"] = attrs[legacy_key]
                 break
     return attrs
 

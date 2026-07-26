@@ -36,6 +36,12 @@ def chat_span(
     max_tokens=None,
     name=None,
 ):
+    """output_tokens is the raw wire value (whatever a real provider would
+    report at gen_ai.usage.output_tokens), matching real OpenAI/Anthropic
+    behavior where reasoning tokens are already included in it -- so a
+    caller passing both output_tokens and reasoning_tokens must make
+    output_tokens the inclusive total, not just the visible portion.
+    """
     attrs = {
         "gen_ai.operation.name": "chat",
         "gen_ai.provider.name": provider,
@@ -44,7 +50,7 @@ def chat_span(
         "gen_ai.usage.output_tokens": output_tokens,
     }
     if reasoning_tokens:
-        attrs["gen_ai.usage.reasoning_tokens"] = reasoning_tokens
+        attrs["gen_ai.usage.reasoning.output_tokens"] = reasoning_tokens
     if cache_read:
         attrs["gen_ai.usage.cache_read_input_tokens"] = cache_read
     if cache_creation:

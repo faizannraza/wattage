@@ -56,7 +56,10 @@ spans.append(
     )
 )
 adv(900_000_000)
-# reasoning-heavy, small-output call -> reasoning_overspend bait
+# reasoning-heavy, small-output call -> reasoning_overspend bait.
+# output_tokens (980) is the raw wire value -- inclusive of the 900
+# reasoning tokens, matching real provider behavior -- so the visible
+# output normalize.py derives is 980 - 900 = 80 tokens.
 spans.append(
     chat_span(
         "orch-c2",
@@ -67,7 +70,7 @@ spans.append(
         "anthropic",
         "claude-sonnet-4-6",
         1600,
-        80,
+        980,
         reasoning_tokens=900,
     )
 )

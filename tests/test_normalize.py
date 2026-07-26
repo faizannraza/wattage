@@ -39,7 +39,11 @@ def test_negative_input_tokens_raises_instead_of_silently_subtracting_cost() -> 
         "gen_ai.usage.output_tokens",
         "gen_ai.usage.cache_read_input_tokens",
         "gen_ai.usage.cache_creation_input_tokens",
-        "gen_ai.usage.reasoning_tokens",
+        # The canonical name normalize_llm_call reads directly -- the legacy
+        # flat "gen_ai.usage.reasoning_tokens" alias is only applied by the
+        # OTLP adapter's _apply_legacy_aliases, which this test bypasses by
+        # constructing a RawSpan directly.
+        "gen_ai.usage.reasoning.output_tokens",
     ],
 )
 def test_negative_tokens_raises_for_every_usage_field(field: str) -> None:
@@ -47,11 +51,65 @@ def test_negative_tokens_raises_for_every_usage_field(field: str) -> None:
         {
             "gen_ai.provider.name": "anthropic",
             "gen_ai.request.model": "claude-sonnet-4-6",
+            # keeps reasoning <= output except when output itself is the field under test
+            "gen_ai.usage.output_tokens": 100,
             field: -1,
         }
     )
     with pytest.raises(AdapterError, match="cannot be negative"):
         normalize_llm_call(span)
+
+
+def test_reasoning_tokens_are_split_out_of_the_raw_inclusive_output_count() -> None:
+    """The real bug this closes: both OpenAI (completion_tokens_details.
+    reasoning_tokens) and Anthropic (output_tokens_details.thinking_tokens)
+    confirm reasoning tokens are already included in the provider's raw
+    output_tokens count, not billed separately on top -- but normalize.py
+    used to read output_tokens and reasoning_tokens as two independent,
+    additive quantities, double-billing every reasoning-heavy call. The
+    raw wire value (980) must split into visible output (80) + reasoning
+    (900), not be treated as 980 visible output plus 900 more on top."""
+    span = _chat_span(
+        {
+            "gen_ai.provider.name": "anthropic",
+            "gen_ai.request.model": "claude-sonnet-4-6",
+            "gen_ai.usage.output_tokens": 980,
+            "gen_ai.usage.reasoning.output_tokens": 900,
+        }
+    )
+    call = normalize_llm_call(span)
+    assert call.usage.output == 80
+    assert call.usage.reasoning == 900
+    assert call.usage.output + call.usage.reasoning == 980  # true provider-billed total
+
+
+def test_reasoning_tokens_exceeding_raw_output_raises() -> None:
+    """Per the OTel GenAI semconv registry, reasoning.output_tokens SHOULD
+    be included in output_tokens -- reasoning larger than the reported
+    total isn't a real usage shape, so this can't be silently clamped."""
+    span = _chat_span(
+        {
+            "gen_ai.provider.name": "anthropic",
+            "gen_ai.request.model": "claude-sonnet-4-6",
+            "gen_ai.usage.output_tokens": 100,
+            "gen_ai.usage.reasoning.output_tokens": 900,
+        }
+    )
+    with pytest.raises(AdapterError, match="exceeds"):
+        normalize_llm_call(span)
+
+
+def test_no_reasoning_tokens_leaves_output_untouched() -> None:
+    span = _chat_span(
+        {
+            "gen_ai.provider.name": "anthropic",
+            "gen_ai.request.model": "claude-sonnet-4-6",
+            "gen_ai.usage.output_tokens": 150,
+        }
+    )
+    call = normalize_llm_call(span)
+    assert call.usage.output == 150
+    assert call.usage.reasoning == 0
 
 
 def test_zero_and_absent_token_counts_are_unaffected() -> None:

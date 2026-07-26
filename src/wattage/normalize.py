@@ -1,4 +1,15 @@
-"""Raw spans -> typed calls (LLMCall/ToolCall/RetrievalCall), per doc §7.4/Appendix A."""
+"""Raw spans -> typed calls (LLMCall/ToolCall/RetrievalCall), per doc §7.4/Appendix A.
+
+TokenUsage.output is always the *visible* (non-reasoning) portion, and
+TokenUsage.reasoning is tracked separately -- confirmed against real
+provider docs, not assumed: both OpenAI's completion_tokens_details.
+reasoning_tokens and Anthropic's output_tokens_details.thinking_tokens
+report reasoning as a subset already included in the provider's raw
+output_tokens count, not an additional charge on top of it. This module
+does that split once, here, so every downstream consumer (pricing,
+token_breakdown, detectors) can just add usage.output + usage.reasoning
+without re-deriving or double-billing it.
+"""
 
 from __future__ import annotations
 
@@ -50,9 +61,31 @@ def _provider_and_model(a: dict[str, Any]) -> tuple[str, str]:
 def normalize_llm_call(span: RawSpan) -> LLMCall:
     a = span.attributes
     provider, model = _provider_and_model(a)
+
+    raw_output = _as_token_count(a.get("gen_ai.usage.output_tokens"), "gen_ai.usage.output_tokens")
+    reasoning = _as_token_count(
+        a.get("gen_ai.usage.reasoning.output_tokens"), "gen_ai.usage.reasoning.output_tokens"
+    )
+    if reasoning > raw_output:
+        # Per the OTel GenAI semconv registry, reasoning.output_tokens
+        # "SHOULD be included in gen_ai.usage.output_tokens" -- both
+        # OpenAI and Anthropic bill reasoning/thinking tokens as part of
+        # output_tokens, with the reasoning attribute reporting a subset
+        # for breakdown, not an extra amount on top. Reasoning exceeding
+        # the reported output total is therefore not a real usage shape.
+        raise AdapterError(
+            f"gen_ai.usage.reasoning.output_tokens ({reasoning}) exceeds "
+            f"gen_ai.usage.output_tokens ({raw_output}) -- reasoning tokens must be a "
+            "subset of output tokens"
+        )
+
     usage = TokenUsage(
         input=_as_token_count(a.get("gen_ai.usage.input_tokens"), "gen_ai.usage.input_tokens"),
-        output=_as_token_count(a.get("gen_ai.usage.output_tokens"), "gen_ai.usage.output_tokens"),
+        # Visible (non-reasoning) output only -- reasoning is billed at the
+        # same output rate but tracked as its own TokenUsage field, so
+        # subtracting it here keeps the two additive without double-billing
+        # what the provider already counted once inside raw_output.
+        output=raw_output - reasoning,
         cache_read=_as_token_count(
             a.get("gen_ai.usage.cache_read_input_tokens"), "gen_ai.usage.cache_read_input_tokens"
         ),
@@ -60,9 +93,7 @@ def normalize_llm_call(span: RawSpan) -> LLMCall:
             a.get("gen_ai.usage.cache_creation_input_tokens"),
             "gen_ai.usage.cache_creation_input_tokens",
         ),
-        reasoning=_as_token_count(
-            a.get("gen_ai.usage.reasoning_tokens"), "gen_ai.usage.reasoning_tokens"
-        ),
+        reasoning=reasoning,
     )
     return LLMCall(
         span_id=span.span_id,

@@ -105,11 +105,14 @@ add_iter(
     "# Project overview\nA REST API service with JWT auth and a Postgres backend.",
 )
 
-# it6: reasoning_overspend bait -- heavy reasoning, small output
+# it6: reasoning_overspend bait -- heavy reasoning, small output.
+# output_tok (755) is the raw wire value -- inclusive of the 700
+# reasoning tokens, matching real provider behavior -- so the visible
+# output normalize.py derives is 755 - 700 = 55 tokens.
 add_iter(
     6,
     5000,
-    55,
+    755,
     "analyze_stacktrace",
     {"trace_id": "exc-991"},
     "NullPointerException at db.py line 88, triggered by missing null check",

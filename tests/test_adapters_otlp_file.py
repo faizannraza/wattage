@@ -77,6 +77,48 @@ def test_legacy_model_attribute_names_map_to_canonical(tmp_path: Path) -> None:
     assert spans["s-legacy-openai"].attributes["gen_ai.request.model"] == "gpt-4o-legacy"
 
 
+def test_legacy_flat_reasoning_tokens_attribute_maps_to_canonical_name(tmp_path: Path) -> None:
+    """gen_ai.usage.reasoning_tokens (flat) is what this project's own
+    synthetic fixtures used before the official OTel GenAI semconv
+    registry name (gen_ai.usage.reasoning.output_tokens) was confirmed --
+    accepted as a fallback so real instrumentation using either name
+    still works."""
+    path = _write_otlp(
+        tmp_path,
+        [
+            {
+                "traceId": "t1",
+                "spanId": "s1",
+                "name": "chat",
+                "attributes": [
+                    {"key": "gen_ai.usage.reasoning_tokens", "value": {"intValue": "42"}}
+                ],
+            }
+        ],
+    )
+    spans = list(OTLPFileAdapter().read(str(path)))
+    assert spans[0].attributes["gen_ai.usage.reasoning.output_tokens"] == 42
+
+
+def test_canonical_reasoning_tokens_attribute_wins_over_legacy(tmp_path: Path) -> None:
+    path = _write_otlp(
+        tmp_path,
+        [
+            {
+                "traceId": "t1",
+                "spanId": "s1",
+                "name": "chat",
+                "attributes": [
+                    {"key": "gen_ai.usage.reasoning_tokens", "value": {"intValue": "999"}},
+                    {"key": "gen_ai.usage.reasoning.output_tokens", "value": {"intValue": "42"}},
+                ],
+            }
+        ],
+    )
+    spans = list(OTLPFileAdapter().read(str(path)))
+    assert spans[0].attributes["gen_ai.usage.reasoning.output_tokens"] == 42
+
+
 def test_canonical_model_attribute_wins_over_legacy(tmp_path: Path) -> None:
     path = _write_otlp(
         tmp_path,

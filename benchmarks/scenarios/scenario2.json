@@ -496,11 +496,11 @@
                 {
                   "key": "gen_ai.usage.output_tokens",
                   "value": {
-                    "intValue": "55"
+                    "intValue": "755"
                   }
                 },
                 {
-                  "key": "gen_ai.usage.reasoning_tokens",
+                  "key": "gen_ai.usage.reasoning.output_tokens",
                   "value": {
                     "intValue": "700"
                   }

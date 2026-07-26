@@ -7,6 +7,38 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Reasoning tokens were double-billed on every reasoning-model call.**
+  Confirmed against both providers' own docs, not assumed: OpenAI's
+  `completion_tokens_details.reasoning_tokens` and Anthropic's
+  `output_tokens_details.thinking_tokens` are both already included in
+  the provider's raw `output_tokens`/`completion_tokens` count — a
+  breakdown of the total, not extra tokens billed on top of it. The
+  official OTel GenAI semconv registry attribute
+  (`gen_ai.usage.reasoning.output_tokens`) says the same explicitly: "The
+  value SHOULD be included in `gen_ai.usage.output_tokens`." `normalize.py`
+  read `output_tokens` and `reasoning_tokens` as two independent, additive
+  quantities, so `pricing/engine.py`'s `output_cost + reasoning_cost`
+  double-charged every reasoning-heavy call by the reasoning portion.
+  Separately, wattage's own attribute name (`gen_ai.usage.reasoning_tokens`,
+  flat) never matched the official nested name, so correctly-instrumented
+  real traces wouldn't have populated the field at all. Fixed:
+  `normalize.py` now splits the raw, inclusive `output_tokens` into visible
+  output (`raw_output - reasoning`) and reasoning, so both provider-billed
+  quantities are counted exactly once; reasoning exceeding the reported
+  output total (not a real usage shape, per the same spec) raises
+  `AdapterError`. The adapter now accepts both the official attribute name
+  and the flat legacy one this project's own fixtures used. This project's
+  own synthetic ground-truth fixtures (`benchmarks/scenarios/
+  scenario1_customer_support.py`, `scenario2_coding_agent.py`) modeled the
+  same wrong (additive) convention — their two reasoning-heavy calls were
+  rewritten to report the raw, inclusive wire value real instrumentation
+  would send, and re-verified end-to-end: both scenarios' `total_dollars`
+  and `reasoning_overspend` findings are unchanged (the fixtures' own
+  hand-derived intent — a small visible answer plus heavy reasoning — was
+  correct all along; only the wire-format shape needed to become
+  realistic). `GROUND_TRUTH.md` updated to match, including one pre-existing,
+  unrelated doc/code drift caught in the same paragraph (700/55 reasoning/
+  output tokens, not the previously-documented 800/60).
 - **A negative token count silently subtracted from `total_dollars`.**
   `normalize.py`'s attribute parser accepted any integer for
   `gen_ai.usage.{input,output,cache_read_input,cache_creation_input,

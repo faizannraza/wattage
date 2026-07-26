@@ -19,6 +19,17 @@ Pricing: anthropic claude-sonnet-4-6 (input 3.0e-6, output 15.0e-6, cache_read_m
 (input 1.0e-6, output 5.0e-6), openai models per pricing.yaml — confirm exact
 figures against the file when computing expected dollar amounts.
 
+Reasoning tokens: confirmed against real provider docs (both OpenAI's
+completion_tokens_details.reasoning_tokens and Anthropic's
+output_tokens_details.thinking_tokens) that reasoning is billed as a
+*subset* already included in the provider's raw output_tokens, not billed
+separately on top. `span_builder.py`'s `chat_span(..., output_tokens=X,
+reasoning_tokens=Y)` therefore expects `output_tokens` to be the raw,
+reasoning-inclusive wire value -- `normalize.py` derives the *visible*
+output (X - Y) and keeps `Y` as its own TokenUsage.reasoning field. The
+per-call numbers below (e.g. "80 output tokens") are always this derived
+visible amount, not the raw wire attribute in the .json fixture.
+
 ---
 
 ## Scenario 1 — E-commerce customer support multi-agent system
@@ -125,9 +136,9 @@ evidence/state computation over a long real trajectory.
   fire once.
 - it5 (mid-exploration): a file-summary chat call with no max_tokens cap
   and 1500 output tokens → **verbosity** fires (medium, since 1500 < 3000).
-- it6: a "which file is the bug in" decision call with 800 reasoning tokens
-  and only 60 output tokens → **reasoning_overspend** fires (medium, since
-  800 < 1500 = 3x ceiling).
+- it6: a "which file is the bug in" decision call with 700 reasoning tokens
+  and only 55 output tokens → **reasoning_overspend** fires (medium, since
+  700 < 1500 = 3x ceiling).
 - it7-20 (14 iterations): STALLED pattern at real scale — every iteration
   calls run_tests(attempt=i) (same tool, fuzzy arg), result is always
   "FAILED: 2 tests still failing" (near-identical boilerplate), input_tok

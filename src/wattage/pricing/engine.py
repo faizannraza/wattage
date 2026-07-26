@@ -28,6 +28,10 @@ class PricingEngine:
 
         usage = call.usage
         input_cost = usage.input * price.input
+        # usage.output is the visible (non-reasoning) portion only --
+        # normalize.py already splits a provider's raw, reasoning-inclusive
+        # output_tokens count into these two fields, so adding them here is
+        # correct, not a double-charge (both are billed at the output rate).
         output_cost = usage.output * price.output
         cache_read_cost = usage.cache_read * price.input * price.cache_read_mult
         cache_creation_cost = usage.cache_creation * price.input * price.cache_write_mult
