@@ -12,7 +12,7 @@ requires-python = ">=3.10"
 authors = [{ name = "Muhammad Faizan Raza" }]
 keywords = ["llm", "agents", "opentelemetry", "observability", "cost", "tokens"]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python :: 3",
@@ -50,6 +50,8 @@ docs = [
 [project.urls]
 Homepage = "https://github.com/faizannraza/wattage"
 Repository = "https://github.com/faizannraza/wattage"
+Documentation = "https://faizannraza.github.io/wattage/"
+Changelog = "https://github.com/faizannraza/wattage/blob/main/CHANGELOG.md"
 
 [project.scripts]
 wattage = "wattage.cli:app"

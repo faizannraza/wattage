@@ -43,3 +43,33 @@ jobs:
         run: uv sync --extra docs
       - name: mkdocs build --strict
         run: uv run mkdocs build --strict
+
+  # Deploys the same build the `docs` job already verified, but only from a
+  # real push to main -- never from a PR, so a fork can't get its untrusted
+  # build published to Pages. Uses the modern Actions-based Pages deploy (no
+  # gh-pages branch); requires Settings -> Pages -> Source: GitHub Actions
+  # to be set once, which only a repo admin can do.
+  deploy-docs:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: docs
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+      - name: Install dependencies
+        run: uv sync --extra docs
+      - name: mkdocs build --strict
+        run: uv run mkdocs build --strict
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - uses: actions/deploy-pages@v4
+        id: deployment

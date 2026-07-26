@@ -1,11 +1,21 @@
-# Wattage
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/faizannraza/wattage/main/docs/assets/logo-dark.svg">
+  <img alt="wattage" src="https://raw.githubusercontent.com/faizannraza/wattage/main/docs/assets/logo.svg" height="56">
+</picture>
+
+[![CI](https://github.com/faizannraza/wattage/actions/workflows/ci.yml/badge.svg)](https://github.com/faizannraza/wattage/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/wattage.svg)](https://pypi.org/project/wattage/)
+[![npm](https://img.shields.io/npm/v/wattage-cli.svg)](https://www.npmjs.com/package/wattage-cli)
+[![Python versions](https://img.shields.io/pypi/pyversions/wattage.svg)](https://pypi.org/project/wattage/)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/faizannraza/wattage/blob/main/LICENSE)
+[![Docs](https://img.shields.io/badge/docs-mkdocs--material-blue)](https://faizannraza.github.io/wattage/)
 
 **A Kill-A-Watt meter for your AI agents.** Point it at a trace and it tells
 you exactly where your tokens are being burned and wasted, prices each waste
 pattern in real dollars, prescribes a fix, and can fail your CI when a change
 makes your agent measurably more expensive.
 
-![wattage report demo](docs/assets/demo.gif)
+![wattage report demo](https://raw.githubusercontent.com/faizannraza/wattage/main/docs/assets/demo.gif)
 
 *A real captured agent trace (see [provenance](benchmarks/traces/README.md)) —
 Wattage catches a stable prompt prefix being re-sent instead of cached, prices

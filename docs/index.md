@@ -1,4 +1,10 @@
-# Wattage
+![wattage](assets/logo.svg#only-light){ height="56" }
+![wattage](assets/logo-dark.svg#only-dark){ height="56" }
+
+[![CI](https://github.com/faizannraza/wattage/actions/workflows/ci.yml/badge.svg)](https://github.com/faizannraza/wattage/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/wattage.svg)](https://pypi.org/project/wattage/)
+[![npm](https://img.shields.io/npm/v/wattage-cli.svg)](https://www.npmjs.com/package/wattage-cli)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/faizannraza/wattage/blob/main/LICENSE)
 
 **A Kill‑A‑Watt meter for your AI agents.**
 
