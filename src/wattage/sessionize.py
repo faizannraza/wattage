@@ -17,7 +17,11 @@ single Loop of iterations; a task with pure chat (no tool/retrieval calls at
 all) has no loop — those calls sit directly on Task.llm_calls.
 
 Loop.reached_success is set by a structural heuristic (see
-_infer_reached_success) — not a semantic guarantee.
+_infer_reached_success) — not a semantic guarantee, and not read by
+nonconvergence's classification anymore (see detectors/convergence.py):
+it's true for any loop ending in a plain chat response, which includes
+both a genuine success and an agent simply giving up with an
+uninformative final answer. Kept as informational metadata only.
 """
 
 from __future__ import annotations
@@ -126,7 +130,11 @@ def _infer_reached_success(iterations: list[Iteration]) -> bool:
     if its last iteration produced LLM output with no further tool call
     pending — i.e. the agent stopped calling tools rather than being cut off
     mid-action. Genuine goal-completion detection needs semantics (an
-    explicit goal signal or the optional judge), which this doesn't have.
+    explicit goal signal or the optional judge), which this doesn't have —
+    this is equally true whether the agent actually solved the task or
+    just gave up with a final "I couldn't do this" answer, which is why
+    nonconvergence no longer treats this flag as a classification gate
+    (see detectors/convergence.py). Retained as informational metadata.
     """
     if not iterations:
         return False

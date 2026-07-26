@@ -49,9 +49,18 @@ def test_short_loop_below_min_iterations_is_never_analyzed(engine: PricingEngine
     assert _run(loop, engine) == []
 
 
-def test_loop_that_reached_success_is_never_flagged(engine: PricingEngine) -> None:
-    """Even if the middle looked repetitive, doc §5.5 says never punish success."""
-    iterations = [
+def test_thrashing_loop_ending_in_an_uninformative_final_answer_is_still_flagged(
+    engine: PricingEngine,
+) -> None:
+    """Regression test for a real bug found via rigorous testing: sessionize's
+    reached_success heuristic marks a loop "successful" whenever its last
+    iteration is a plain chat response with no pending tool call -- which
+    is structurally indistinguishable from a loop that thrashed the whole
+    time and then simply gave up. Message content isn't captured by the
+    real adapter, so an uninformative final answer must not be treated as
+    evidence the loop actually recovered, no matter what Loop.reached_success
+    (a coarse structural proxy, doc §5.5) says."""
+    thrashing = [
         Iteration(
             index=i,
             llm_calls=[_llm(f"l{i}", engine)],
@@ -59,7 +68,44 @@ def test_loop_that_reached_success_is_never_flagged(engine: PricingEngine) -> No
         )
         for i in range(5)
     ]
-    loop = Loop(loop_id="loop0", iterations=iterations, reached_success=True)
+    give_up_answer = Iteration(index=5, llm_calls=[_llm("l5", engine)])
+    loop = Loop(loop_id="loop0", iterations=[*thrashing, give_up_answer], reached_success=True)
+
+    findings = _run(loop, engine)
+    assert len(findings) == 1
+    assert findings[0].subtype == "thrashing"
+
+
+def test_loop_with_genuine_late_recovery_is_still_not_flagged(engine: PricingEngine) -> None:
+    """The other half of the same fix: a loop that thrashes initially but
+    then genuinely recovers -- real, substantive, different content, not
+    just an empty final answer -- must still be recognized as productive
+    on its own merits, without needing reached_success at all."""
+    thrashing = [
+        Iteration(
+            index=i,
+            llm_calls=[_llm(f"l{i}", engine)],
+            tool_calls=[_tool(f"t{i}", "run_tests", {"attempt": i}, "FAILED: same error")],
+        )
+        for i in range(2)
+    ]
+    recovery = Iteration(
+        index=2,
+        llm_calls=[_llm("l2", engine)],
+        tool_calls=[
+            _tool(
+                "t2",
+                "read_file",
+                {"path": "/repo/src/actual_bug.py"},
+                "Found the real root cause: a missing null check on line 42.",
+            )
+        ],
+    )
+    final_answer = Iteration(index=3, llm_calls=[_llm("l3", engine)])
+    loop = Loop(
+        loop_id="loop0", iterations=[*thrashing, recovery, final_answer], reached_success=False
+    )
+
     assert _run(loop, engine) == []
 
 

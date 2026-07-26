@@ -9,6 +9,21 @@ oscillation (a detected cycle) is checked first since it's the most specific
 signature, then the stalled signature (evidence and state both flat while
 context keeps growing — the shallow-guard blind spot doc §5.1 calls out),
 and general thrashing is the catch-all.
+
+"Recovered" must be earned by genuine, observable content, not merely by
+ending the loop: an iteration with no captured action/result text (a
+chat-only final answer — the normal shape, since message content isn't
+captured by the real adapter) falls back to a neutral signal value that
+happens to clear theta_prog on its own. last_productive_index excludes
+such iterations from counting as "the loop got back on track" — a loop
+that thrashed throughout and simply gave up with an uninformative final
+answer must still be flagged, the same as if it had never answered at
+all. This replaced an earlier, coarser gate (Loop.reached_success) that
+exempted a loop's entire classification whenever it ended without a
+pending tool call, regardless of whether the final answer actually
+represented progress — real-world testing showed that gate silently
+disabled the detector on most real, complete traces, since agents
+virtually always produce *some* final response, good or bad.
 """
 
 from __future__ import annotations
@@ -58,8 +73,24 @@ def combine_progress(signals: IterationSignals, weights: ConvergenceWeights) -> 
     return max(0.0, min(1.0, score))
 
 
-def last_productive_index(progress_scores: list[float], theta_prog: float) -> int | None:
-    productive_indices = [i for i, p in enumerate(progress_scores) if p >= theta_prog]
+def last_productive_index(
+    progress_scores: list[float], has_content: list[bool], theta_prog: float
+) -> int | None:
+    """An iteration only counts as evidence the loop got back on track if it
+    had genuine, observable content to judge in the first place. A
+    chat-only final answer with no captured message text (has_content=
+    False -- the normal case, since LLMCall.messages is never populated by
+    the real adapter) falls back to the embedder's neutral "no signal"
+    score for E and S, which happens to clear theta_prog on its own -- that
+    must never be mistaken for evidence the loop actually recovered, or a
+    loop that thrashed throughout and then simply gave up with an
+    uninformative final answer would be wrongly exempted from every check
+    below."""
+    productive_indices = [
+        i
+        for i, (p, content) in enumerate(zip(progress_scores, has_content, strict=True))
+        if p >= theta_prog and content
+    ]
     return productive_indices[-1] if productive_indices else None
 
 
@@ -68,8 +99,9 @@ def classify_loop(
     progress_scores: list[float],
     thresholds: ClassificationThresholds,
 ) -> LoopClass:
+    has_content = [s.has_observable_content for s in iteration_signals]
     n = len(progress_scores)
-    last_prod = last_productive_index(progress_scores, thresholds.theta_prog)
+    last_prod = last_productive_index(progress_scores, has_content, thresholds.theta_prog)
     streak = n if last_prod is None else n - 1 - last_prod
 
     if streak < thresholds.consecutive_k:

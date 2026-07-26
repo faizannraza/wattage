@@ -47,6 +47,15 @@ class IterationSignals:
     oscillation: float
     growth_penalty: float
     goal_proximity: float
+    # True if this iteration's action and/or result text is genuinely
+    # non-empty -- i.e. there's something real to have judged E/S against.
+    # A chat-only final iteration with no captured message content (the
+    # normal case: LLMCall.messages is never populated by the real adapter)
+    # has empty action AND info text, so E/S both fall back to the
+    # embedder's neutral "no signal" value -- which must never be
+    # mistaken for *evidence of progress* when deciding whether a loop
+    # actually recovered (see last_productive_index in classify.py).
+    has_observable_content: bool
 
 
 def new_information_text(iteration: Iteration) -> str:
@@ -178,7 +187,12 @@ def compute_iteration_signals(
 
         results.append(
             IterationSignals(
-                evidence_gain=e, state_delta=s, oscillation=o, growth_penalty=g, goal_proximity=p
+                evidence_gain=e,
+                state_delta=s,
+                oscillation=o,
+                growth_penalty=g,
+                goal_proximity=p,
+                has_observable_content=bool(action) or bool(info),
             )
         )
 

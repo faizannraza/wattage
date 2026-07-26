@@ -5,11 +5,21 @@ wires it to a session's loops and implements the wasted-token attribution
 from §5.4 (everything after the last iteration whose progress crossed
 theta_prog).
 
-"Never punish a loop that ultimately succeeded" (§5.5) is implemented via
-sessionize's reached_success heuristic: such loops are skipped entirely
-rather than attempting to pinpoint a post-success tail, which would need
-semantic judgment (the optional judge, off by default) this MVP doesn't
-invoke automatically.
+"Never punish a loop that ultimately succeeded" (§5.5) is earned by
+classify_loop itself, not gated here on Loop.reached_success: real-world
+testing showed that gate is far too coarse to trust. Loop.reached_success
+is true whenever a loop's last iteration is a plain chat response with no
+pending tool call — which is indistinguishable, structurally, from a loop
+that thrashed the whole time and then simply gave up with an
+uninformative final answer (message content isn't captured by the real
+adapter, so there's no way to tell "genuinely solved it" from "gave up"
+from the span data alone). Gating classification on that flag meant a
+loop could burn arbitrary money thrashing and never be flagged, purely
+because it happened to end with *any* final response. classify_loop's own
+last_productive_index now requires genuine, observable content to credit
+an iteration as evidence of recovery (see classify.py) — a real recovery
+(genuinely novel, useful actions/results) is recognized on its own merits;
+an empty final answer is not mistaken for one.
 """
 
 from __future__ import annotations
@@ -78,8 +88,6 @@ class NonConvergenceDetector:
         iterations = loop.iterations
         if len(iterations) < cfg.min_iterations:
             return None
-        if loop.reached_success:
-            return None  # never punish a loop that ultimately succeeded (doc §5.5)
 
         embedder = ctx.embedder or build_embedder(cfg.embed)
         weights = ConvergenceWeights(
@@ -107,7 +115,8 @@ class NonConvergenceDetector:
         if loop_class == LoopClass.productive:
             return None
 
-        last_prod = last_productive_index(progress_scores, cfg.theta_prog)
+        has_content = [s.has_observable_content for s in signals]
+        last_prod = last_productive_index(progress_scores, has_content, cfg.theta_prog)
         wasted_from = 0 if last_prod is None else last_prod + 1
         wasted_iterations = iterations[wasted_from:]
 

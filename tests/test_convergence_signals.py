@@ -130,3 +130,17 @@ def test_compute_iteration_signals_returns_one_entry_per_iteration() -> None:
     ]
     signals = compute_iteration_signals(iterations, HashEmbedder())
     assert len(signals) == 3
+
+
+def test_has_observable_content_is_false_for_a_chat_only_iteration_with_no_messages() -> None:
+    """The normal shape for a final answer: no tool call, and no captured
+    message text either (LLMCall.messages is never populated by the real
+    adapter) -- action_text and new_information_text are both empty, so
+    there's nothing real to have judged E/S against."""
+    iterations = [
+        Iteration(index=0, llm_calls=[_llm()], tool_calls=[_tool("a", {}, "real result text")]),
+        Iteration(index=1, llm_calls=[_llm()]),  # chat-only, no messages captured
+    ]
+    signals = compute_iteration_signals(iterations, HashEmbedder())
+    assert signals[0].has_observable_content is True
+    assert signals[1].has_observable_content is False
