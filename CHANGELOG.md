@@ -7,6 +7,27 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **A corrupt `.wattage/baseline.json` broke `wattage ci`'s exit-code
+  contract.** `run_ci`'s `try/except` around ingestion never extended to
+  `load_baseline`/`record_run`/`save_baseline` — found by an independent
+  adversarial review, then reproduced four ways: merge-conflict markers
+  left in the file (the realistic trigger — two branches both updating a
+  committed baseline), invalid JSON, a schema violation, and a corrupt
+  timestamp in a history entry all raised uncaught
+  (`pydantic.ValidationError` / `ValueError` / `OSError`) straight through
+  `run_ci`, landing on Python's default exit code 1 — indistinguishable
+  from exit 1's real documented meaning, "a fail-on threshold breached."
+  A corrupt baseline file could red out a build as a phantom cost
+  regression instead of reporting the real problem. Fixed: the whole
+  baseline load/evaluate/record/save block now maps any such failure to
+  the already-documented exit code 2 ("config/usage error").
+- **SARIF's `driver.version` was hardcoded to `"0.1.0"` while the package
+  was already `0.1.1`.** `render_sarif()`'s default parameter never tracked
+  `wattage.__version__`, and the CLI never overrode it — every SARIF
+  upload to GitHub's Security tab misidentified the exact engine version
+  that produced the results, and would drift further at every future
+  release with zero test coverage catching it. Fixed: the default now
+  resolves to `__version__` directly, and the CLI passes it explicitly.
 - **Pinning the GitHub Action didn't actually pin the analysis engine.**
   `action.yml` ran `uv tool install wattage --quiet` — unpinned, so it
   always installed whatever was newest on PyPI regardless of which tag a

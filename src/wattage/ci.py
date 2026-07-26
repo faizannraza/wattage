@@ -15,6 +15,8 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 
+from pydantic import ValidationError
+
 from wattage.adapters.base import AdapterError
 from wattage.baseline import (
     Baseline,
@@ -139,20 +141,33 @@ def run_ci(
             ],
         )
 
-    # The baseline as it stood *before* this run — what this run was actually
-    # compared against, and what render_pr_comment/render's delta table
-    # should diff against. Comparing against the post-update baseline would
-    # (once this run itself becomes last_passing) show the run diffed
-    # against itself: always "no change".
-    baseline_before = load_baseline(resolved_baseline_path)
-    reasons = evaluate_fail_on(report, baseline_before, fail_on)
-    passed = not reasons
-    exit_code = EXIT_PASS if passed else EXIT_FAIL
+    try:
+        # The baseline as it stood *before* this run — what this run was
+        # actually compared against, and what render_pr_comment/render's
+        # delta table should diff against. Comparing against the
+        # post-update baseline would (once this run itself becomes
+        # last_passing) show the run diffed against itself: always "no
+        # change".
+        baseline_before = load_baseline(resolved_baseline_path)
+        reasons = evaluate_fail_on(report, baseline_before, fail_on)
+        passed = not reasons
+        exit_code = EXIT_PASS if passed else EXIT_FAIL
 
-    if update_baseline:
-        updated = record_run(
-            baseline_before, report, passed=passed, window_days=config.ci.rolling_window_days
+        if update_baseline:
+            updated = record_run(
+                baseline_before, report, passed=passed, window_days=config.ci.rolling_window_days
+            )
+            save_baseline(resolved_baseline_path, updated)
+    except (OSError, ValidationError, ValueError) as exc:
+        # baseline.json is a plain committed file a user (or a bad merge)
+        # can hand-corrupt -- a config-level problem, not a real cost
+        # regression. Letting this fall through uncaught would land on
+        # Python's default exit code 1, indistinguishable from exit 1's
+        # real documented meaning ("a fail-on threshold breached"): a
+        # corrupt baseline would masquerade as a genuine regression.
+        return CIResult(
+            exit_code=EXIT_CONFIG_ERROR,
+            reasons=[f"could not read/update baseline {resolved_baseline_path!r}: {exc}"],
         )
-        save_baseline(resolved_baseline_path, updated)
 
     return CIResult(exit_code=exit_code, report=report, baseline=baseline_before, reasons=reasons)

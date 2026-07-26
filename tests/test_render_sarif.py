@@ -1,5 +1,6 @@
 import json
 
+from wattage import __version__
 from wattage.models import Finding, QualityRisk, Report, Score, Severity
 from wattage.render.sarif import render_sarif
 
@@ -46,6 +47,16 @@ def test_output_is_valid_json_matching_sarif_2_1_0() -> None:
     assert sarif["version"] == "2.1.0"
     assert len(sarif["runs"]) == 1
     assert sarif["runs"][0]["tool"]["driver"]["name"] == "wattage"
+
+
+def test_driver_version_defaults_to_the_installed_package_version() -> None:
+    """The real bug this closes: driver.version defaulted to a hardcoded
+    "0.1.0" that never tracked wattage.__version__ (already 0.1.1), so
+    every SARIF upload to GitHub's Security tab misidentified the exact
+    engine version that produced the results -- and would drift further at
+    every future release with no test catching it."""
+    sarif = json.loads(render_sarif(_report([_finding("prefix_churn", Severity.high)])))
+    assert sarif["runs"][0]["tool"]["driver"]["version"] == __version__
 
 
 def test_severity_maps_to_sarif_level() -> None:

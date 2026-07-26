@@ -6,6 +6,7 @@ import pytest
 from rich.console import Console
 from typer.testing import CliRunner
 
+from wattage import __version__
 from wattage.cli import app
 from wattage.render.terminal import render_terminal
 from wattage.report import build_report
@@ -443,6 +444,8 @@ def test_ci_command_writes_pr_comment_sarif_and_junit_outputs(tmp_path: Path) ->
 
     assert result.exit_code == 0
     assert "no baseline yet" in pr_comment_path.read_text(encoding="utf-8")
-    assert json.loads(sarif_path.read_text(encoding="utf-8"))["version"] == "2.1.0"
+    sarif = json.loads(sarif_path.read_text(encoding="utf-8"))
+    assert sarif["version"] == "2.1.0"
+    assert sarif["runs"][0]["tool"]["driver"]["version"] == __version__
     assert junit_path.read_text(encoding="utf-8").startswith('<?xml version="1.0"')
     assert badge_path.read_text(encoding="utf-8").startswith('<?xml version="1.0"')

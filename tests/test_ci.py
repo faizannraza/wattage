@@ -158,6 +158,49 @@ def _write(path: Path, content: str) -> str:
     return str(path)
 
 
+@pytest.mark.parametrize(
+    "make_baseline",
+    [
+        lambda tmp_path: _write(
+            tmp_path / "conflict.json",
+            '<<<<<<< HEAD\n{"last_passing": null}\n=======\n'
+            '{"last_passing": null}\n>>>>>>> branch\n',
+        ),
+        lambda tmp_path: _write(tmp_path / "bad.json", "not json"),
+        lambda tmp_path: _write(tmp_path / "bad_schema.json", '{"last_passing": "not an object"}'),
+        lambda tmp_path: _write(
+            tmp_path / "bad_timestamp.json",
+            json.dumps(
+                {
+                    "last_passing": None,
+                    "history": [
+                        {
+                            "recorded_at": "not-a-date",
+                            "efficiency": 90,
+                            "grade": "A",
+                            "total_dollars": 1.0,
+                        }
+                    ],
+                }
+            ),
+        ),
+    ],
+    ids=["merge-conflict-markers", "malformed-json", "bad-schema", "bad-timestamp"],
+)
+def test_corrupt_baseline_returns_exit_code_2_not_1(tmp_path: Path, make_baseline: object) -> None:
+    """A corrupt .wattage/baseline.json (a plain committed file a user or a
+    bad merge can hand-corrupt -- baseline.py's own docstring says as much)
+    must never surface as exit code 1, which the doc's own contract
+    reserves for "a fail-on threshold breached": a corrupt baseline is a
+    config problem, not a real cost regression, and reporting it as one
+    would red out a build for the wrong reason. Previously, load_baseline/
+    record_run's exceptions weren't caught at all, so this fell through to
+    Python's default uncaught-exception exit code (1)."""
+    baseline_path = make_baseline(tmp_path)  # type: ignore[operator]
+    result = run_ci(str(SAMPLE_TRACE), baseline_path=baseline_path)
+    assert result.exit_code == EXIT_CONFIG_ERROR
+
+
 def test_unpriced_model_returns_exit_code_4(tmp_path: Path) -> None:
     trace_path = tmp_path / "unknown_model.json"
     trace_path.write_text(

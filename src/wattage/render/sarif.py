@@ -12,6 +12,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from wattage import __version__
 from wattage.models import Report, Severity
 
 _LEVEL_BY_SEVERITY = {
@@ -23,7 +24,7 @@ _LEVEL_BY_SEVERITY = {
 }
 
 
-def render_sarif(report: Report, tool_version: str = "0.1.0") -> str:
+def render_sarif(report: Report, tool_version: str = __version__) -> str:
     rule_ids = sorted({f.id for f in report.findings})
     rules = [{"id": rule_id, "shortDescription": {"text": rule_id}} for rule_id in rule_ids]
 

@@ -213,7 +213,9 @@ def ci(
                 render_pr_comment(result.report, result.baseline), encoding="utf-8"
             )
         if resolved_sarif_out is not None:
-            resolved_sarif_out.write_text(render_sarif(result.report), encoding="utf-8")
+            resolved_sarif_out.write_text(
+                render_sarif(result.report, tool_version=__version__), encoding="utf-8"
+            )
         if junit_out is not None:
             junit_out.write_text(
                 render_junit(result.report, ci_reasons=result.reasons), encoding="utf-8"
