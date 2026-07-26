@@ -109,7 +109,9 @@ def test_three_detectors_fire_and_aggregate_consistently(integration_trace_path:
     # chat-2 (input 20_500 >= 20_000); chat-2's context (20_500+300=20_800)
     # re-sent into chat-3 (input 21_200 >= 20_800). 20_000 + 20_800 = 40_800.
     assert by_id["prefix_churn"].wasted_tokens == 40_800
-    assert by_id["prefix_churn"].wasted_dollars == pytest.approx(40_800 * 3.0e-6)
+    # Recoverable, not the full resent cost: claude-sonnet-4-6's cache reads
+    # still bill at cache_read_mult (0.10) of the input rate.
+    assert by_id["prefix_churn"].wasted_dollars == pytest.approx(40_800 * 3.0e-6 * (1 - 0.10))
 
     # verbosity: only chat-1 has no max_tokens and output (5_000) over the
     # 1_000-token ceiling; excess = 4_000.

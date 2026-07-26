@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 
 from benchmarks.frontier import build_frontier, render_frontier_svg
+from wattage.report import build_trace_and_report
 
 REPO_ROOT = Path(__file__).parent.parent
 REAL_TRACE = REPO_ROOT / "benchmarks" / "traces" / "any_agent_openai.otlp.json"
@@ -45,6 +46,22 @@ def test_quality_is_reported_unchanged_with_an_honest_structural_note() -> None:
     assert point.after_quality == 1.0
     assert "structural" in point.quality_note.lower()
     assert "not" in point.quality_note.lower()  # "not an eval score"
+
+
+def test_prefix_churn_finding_wasted_dollars_matches_frontiers_savings() -> None:
+    """The real bug this closes: PrefixChurnDetector's Finding.wasted_dollars
+    (the "$X recoverable" figure users actually see) used to credit the
+    *full* resent cost as recoverable, while this module's own before/after
+    simulation already correctly discounted it by cache_read_mult -- two
+    different dollar figures for the same underlying fix, on the same
+    trace. They must now agree."""
+    trace, report = build_trace_and_report(str(REAL_TRACE))
+    detector_wasted = sum(f.wasted_dollars for f in report.findings if f.id == "prefix_churn")
+
+    frontier_savings = build_frontier([REAL_TRACE])[0]
+    savings = frontier_savings.before_dollars - frontier_savings.after_dollars
+
+    assert detector_wasted == pytest.approx(savings, abs=1e-9)
 
 
 def test_trace_with_no_prefix_churn_finding_yields_no_point() -> None:

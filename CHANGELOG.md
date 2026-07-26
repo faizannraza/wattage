@@ -7,6 +7,22 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **`prefix_churn`'s reported dollar figure overstated the achievable
+  savings by ~10%.** `Finding.wasted_dollars` credited the *full* resent
+  cost (`resent_tokens * price.input`) as recoverable, as if enabling
+  caching made a re-sent prefix entirely free. It doesn't: every vendored
+  model's `cache_read_mult` is 0.10, meaning a cache hit still bills at
+  10% of the input rate. `benchmarks/frontier.py`'s real-data before/after
+  simulation already accounted for this correctly (`resent_dollars -
+  cached_dollars`) — so the same fix's savings were reported two different
+  ways depending which part of the codebase you asked, and the one users
+  actually see (the report/badge/PR-comment "$X recoverable" headline) was
+  the inflated one. Fixed: `wasted_dollars` is now `resent_tokens *
+  price.input * (1 - price.cache_read_mult)`, matching frontier.py exactly
+  (verified: they now agree on the same real trace to within floating-point
+  rounding). Severity is unaffected — it's still keyed on the gross resent
+  cost's share of task spend (doc §4.1), which describes the size of the
+  problem independent of how much of it is ultimately recoverable.
 - **`docs/detectors/prefix_churn.md` cited an uncited statistic.** "independent
   audits have found re-sent context accounts for roughly 60% of a typical
   agent's spend" had no source anywhere in the repo — an unverifiable claim

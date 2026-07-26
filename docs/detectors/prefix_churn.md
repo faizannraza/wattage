@@ -13,6 +13,8 @@ Wattage doesn't require message content capture to catch this. For each pair of 
 
 ...then that prior context was almost certainly re-sent verbatim. The monotonic-growth check in condition 2 is what keeps this from flagging a genuinely different or shrunk prefix — a prompt that got smaller or changed shape between turns isn't churn.
 
+The reported dollar figure is the *recoverable* amount, not the full resent cost: a cached prefix still bills at a provider's cache-read rate (10% of the input rate for every model in the vendored registry today), it isn't free. Recoverable dollars = resent tokens × input rate × (1 − cache-read rate).
+
 ## Known limitation
 
 Two coincidentally same-sized-but-different prefixes can't be told apart from token counts alone. Telling them apart for certain needs message content or a prompt fingerprint, which most production traces don't capture (for privacy and payload-size reasons). This is a documented gap, not a silently-accepted inaccuracy — the guard above is specifically designed to keep the false-positive rate low even without content.

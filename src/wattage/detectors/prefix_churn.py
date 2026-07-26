@@ -13,6 +13,14 @@ Known limitation: two coincidentally same-sized-but-different prefixes can't
 be told apart from token counts alone — that needs message capture or a
 prompt fingerprint (see LLMCall.prompt_fingerprint), which isn't populated
 yet. Left as a documented future enhancement rather than faked here.
+
+Finding.wasted_dollars is the *recoverable* amount, not the full resent
+cost: caching a hit still bills at cache_read_mult of the input rate, so
+the achievable savings is resent_dollars * (1 - cache_read_mult), matching
+benchmarks/frontier.py's real-data before/after simulation. Severity stays
+keyed on the gross resent_dollars share of task cost (doc §4.1) -- how much
+of the task's spend the churn touches at all, not how much of that is
+ultimately recoverable.
 """
 
 from __future__ import annotations
@@ -54,6 +62,7 @@ class PrefixChurnDetector:
 
             resent_tokens = 0
             resent_dollars = 0.0
+            recoverable_dollars = 0.0
             span_ids: list[str] = []
             for call, tokens in segments:
                 try:
@@ -62,6 +71,15 @@ class PrefixChurnDetector:
                     continue
                 resent_tokens += tokens
                 resent_dollars += tokens * price.input
+                # The fix (prompt caching) doesn't make a re-sent prefix free --
+                # a cache hit still bills at cache_read_mult of the input rate
+                # (10% for every vendored model today). Crediting the full
+                # resent_dollars as "wasted" overstates the achievable savings
+                # by that same margin; benchmarks/frontier.py's real-data
+                # before/after simulation already accounts for this the same
+                # way (`resent_dollars - cached_dollars`), so this matches it
+                # instead of quietly assuming caching is a 100% discount.
+                recoverable_dollars += tokens * price.input * (1 - price.cache_read_mult)
                 span_ids.append(call.span_id)
 
             if resent_tokens == 0:
@@ -69,6 +87,10 @@ class PrefixChurnDetector:
 
             calls = ordered_llm_calls(task)
             task_dollars = sum(c.cost.total for c in calls)
+            # Severity is about how much of this task's spend went to resending
+            # stale context at all -- the size of the problem -- so it stays
+            # keyed on the gross resent_dollars, independent of what fraction
+            # of that is actually recoverable via caching.
             ratio = resent_dollars / task_dollars if task_dollars > 0 else 0.0
             severity = Severity.high if ratio >= cfg.high_severity_ratio else Severity.medium
 
@@ -77,7 +99,7 @@ class PrefixChurnDetector:
                     id=self.id,
                     severity=severity,
                     wasted_tokens=resent_tokens,
-                    wasted_dollars=resent_dollars,
+                    wasted_dollars=recoverable_dollars,
                     quality_risk=QualityRisk.none,
                     evidence=(
                         f"{resent_tokens} tokens of prior context re-sent uncached across "

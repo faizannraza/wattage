@@ -38,7 +38,9 @@ def test_real_trace_prices_correctly_and_finds_exactly_the_expected_waste() -> N
     # call1's context (269+16=285) re-sent into call2 (input 359 >= 285);
     # call2's context (359+14=373) re-sent into call3 (input 392 >= 373).
     assert finding.wasted_tokens == 285 + 373
-    assert finding.wasted_dollars == pytest.approx((285 + 373) * 0.15e-6)
+    # Recoverable, not the full resent cost: mistral-small-latest's cache
+    # reads still bill at cache_read_mult (0.10) of the input rate.
+    assert finding.wasted_dollars == pytest.approx((285 + 373) * 0.15e-6 * (1 - 0.10))
     assert finding.severity.value == "high"
 
     assert report.score.grade == "F"
