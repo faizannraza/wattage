@@ -19,7 +19,7 @@ None of these were added speculatively — each was found by actually running Wa
 
 ## Pricing
 
-Wattage never fabricates a price. It ships a vendored, versioned pricing snapshot (`src/wattage/pricing/data/pricing.yaml`) sourced directly from each provider's own pricing page, with the fetch date recorded. If a call uses a model with no registry entry, Wattage warns and leaves that call's cost at zero rather than guessing a rate — and `wattage ci` treats any unpriced call as a hard pricing error (exit code 4), because a cost-regression gate built on an undercount isn't trustworthy.
+Wattage never fabricates a price. It ships a vendored, versioned pricing snapshot (`src/wattage/pricing/data/pricing.yaml`) sourced directly from each provider's own pricing page, with the fetch date recorded. If a call uses a model with no registry entry, Wattage leaves that call's cost at zero rather than guessing a rate — and every surface says so plainly rather than showing a plausible-looking grade on incomplete data: `wattage report`/`score`/`badge` name the unpriced model and mark the total cost and score as incomplete (never a quiet "A (100)"), and `wattage ci` treats any unpriced call as a hard pricing error (exit code 4), because a cost-regression gate built on an undercount isn't trustworthy.
 
 You can override or extend the registry with your own `pricing.yaml` via `--pricing`, useful for negotiated enterprise rates or self-hosted models.
 

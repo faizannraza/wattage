@@ -7,6 +7,22 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **An unknown/unpriced model (e.g. a real model not yet in the vendored
+  pricing registry, which covers only 9 models today) silently rendered
+  as `A (100) · $0.0000 · this trace looks efficient`** in `report`,
+  `score`, and `badge` — with only a buried Python `UserWarning` on
+  stderr as any signal something was wrong. `Report.unpriced_calls`
+  existed and was correctly populated but was only ever checked by
+  `wattage ci`; the three most commonly used commands never looked at
+  it. Fixed: all three now name the specific unpriced model(s)
+  (`Report.unpriced_models`, a new field) and mark the grade/cost as
+  incomplete rather than showing a plausible-looking number — the
+  terminal report leads with a prominent warning, the badge shows a
+  neutral grey "unpriced" pill instead of a letter grade (this is the
+  surface most likely to sit unattended on a public README), and
+  `wattage score` replaces the headline entirely rather than pair a fake
+  grade with a caveat. `wattage ci`'s exit-4 reason now also names the
+  model, not just a bare count.
 - **The convergence engine barely fired on real, complete agent traces.**
   Found by an independent adversarial review, then confirmed with two
   separate empirical reproductions: `nonconvergence` exempted a loop's

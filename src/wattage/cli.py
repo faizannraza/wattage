@@ -92,6 +92,14 @@ def score(
         pricing_override=str(pricing) if pricing else None,
         quality_file=str(quality) if quality else None,
     )
+    if report_obj.unpriced_calls:
+        call_word = "call" if report_obj.unpriced_calls == 1 else "calls"
+        models = ", ".join(report_obj.unpriced_models)
+        typer.echo(
+            f"unpriced ({report_obj.unpriced_calls} {call_word}: {models}) — "
+            "see `wattage report` for detail"
+        )
+        return
     s = report_obj.score
     typer.echo(f"{s.grade} ({s.efficiency}) · ${s.recoverable_dollars:.4f} recoverable")
 

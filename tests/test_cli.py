@@ -14,6 +14,51 @@ REPO_ROOT = Path(__file__).parent.parent
 runner = CliRunner()
 
 
+def _write_unpriced_trace(path: Path) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "resourceSpans": [
+                    {
+                        "scopeSpans": [
+                            {
+                                "spans": [
+                                    {
+                                        "traceId": "t1",
+                                        "spanId": "s1",
+                                        "parentSpanId": "",
+                                        "name": "chat",
+                                        "startTimeUnixNano": "0",
+                                        "endTimeUnixNano": "1",
+                                        "attributes": [
+                                            {
+                                                "key": "gen_ai.provider.name",
+                                                "value": {"stringValue": "openai"},
+                                            },
+                                            {
+                                                "key": "gen_ai.request.model",
+                                                "value": {"stringValue": "gpt-4o"},
+                                            },
+                                            {
+                                                "key": "gen_ai.usage.input_tokens",
+                                                "value": {"intValue": "5000"},
+                                            },
+                                            {
+                                                "key": "gen_ai.usage.output_tokens",
+                                                "value": {"intValue": "2000"},
+                                            },
+                                        ],
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        )
+    )
+
+
 def test_version_flag() -> None:
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
@@ -102,6 +147,34 @@ def test_score_command_prints_grade_and_headline() -> None:
     assert result.exit_code == 0
     assert "A (100)" in result.stdout
     assert "recoverable" in result.stdout
+
+
+def test_score_command_shows_unpriced_not_a_fake_grade(tmp_path: Path) -> None:
+    """A grade computed from an incomplete cost figure (an unknown model)
+    must never print as a normal-looking "A (100)" -- that's exactly the
+    plausible-looking-but-wrong number this project exists to avoid."""
+    trace_path = tmp_path / "unpriced.json"
+    _write_unpriced_trace(trace_path)
+
+    result = runner.invoke(app, ["score", str(trace_path)])
+
+    assert result.exit_code == 0
+    assert "unpriced" in result.stdout
+    assert "openai/gpt-4o" in result.stdout
+    assert "A (100)" not in result.stdout
+
+
+def test_report_command_shows_unpriced_warning_prominently(tmp_path: Path) -> None:
+    trace_path = tmp_path / "unpriced.json"
+    _write_unpriced_trace(trace_path)
+
+    result = runner.invoke(app, ["report", str(trace_path)])
+
+    assert result.exit_code == 0
+    assert "unpriced" in result.stdout
+    assert "openai/gpt-4o" in result.stdout
+    assert "incomplete" in result.stdout
+    assert "not a" in result.stdout and "confirmed-efficient" in result.stdout
 
 
 def test_quality_flag_wires_a_real_quality_factor(tmp_path: Path) -> None:

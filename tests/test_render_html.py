@@ -10,10 +10,32 @@ from pathlib import Path
 
 import pytest
 
+from wattage.models import Report, Score, Trace
 from wattage.render.html import render_html
 from wattage.report import build_trace_and_report
 
 REPO_ROOT = Path(__file__).parent.parent
+
+
+def _unpriced_report(unpriced_calls: int, unpriced_models: list[str]) -> Report:
+    return Report(
+        trace_source="t.json",
+        total_dollars=0.0,
+        token_breakdown={},
+        findings=[],
+        score=Score(
+            efficiency=100,
+            grade="A",
+            waste_ratio=0.0,
+            quality_factor=1.0,
+            quality_measured=False,
+            recoverable_dollars=0.0,
+        ),
+        pricing_version="v",
+        generated_at="2026-01-01T00:00:00Z",
+        unpriced_calls=unpriced_calls,
+        unpriced_models=unpriced_models,
+    )
 
 
 @pytest.fixture
@@ -39,6 +61,28 @@ def test_no_findings_case_renders_a_friendly_message() -> None:
     trace, report = build_trace_and_report(str(REPO_ROOT / "examples" / "sample_trace.json"))
     html = render_html(trace, report)
     assert "No findings" in html
+
+
+def test_unpriced_trace_shows_a_banner_and_not_a_letter_grade_chip() -> None:
+    """A grade computed from an incomplete cost figure must never render as
+    a normal-looking letter grade -- this is a shareable HTML report,
+    exactly the kind of artifact someone might screenshot or forward
+    without reading every line."""
+    report = _unpriced_report(1, ["openai/gpt-4o"])
+    html = render_html(Trace(source="t.json", sessions=[]), report)
+
+    assert '<div class="unpriced-banner">' in html
+    assert "openai/gpt-4o" in html
+    assert 'class="score-chip unpriced"' in html
+    assert "A (100)" not in html
+    assert "No findings on the priced portion" in html
+
+
+def test_fully_priced_trace_has_no_unpriced_banner() -> None:
+    trace, report = build_trace_and_report(str(REPO_ROOT / "examples" / "sample_trace.json"))
+    html = render_html(trace, report)
+    assert '<div class="unpriced-banner">' not in html
+    assert 'class="score-chip">' in html  # no stray trailing space in the class attribute
 
 
 # Every href/src that could trigger a network fetch, plus @import and script

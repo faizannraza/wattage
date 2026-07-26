@@ -11,6 +11,12 @@ Shows "~$X/mo recoverable" only when Score.monthly_projection is actually
 populated (it isn't yet — see report.py's own note on why extrapolating
 from one trace's wall-clock duration would be dishonest); otherwise shows
 the per-run recoverable-dollars figure, never a fabricated monthly claim.
+
+When any call couldn't be priced, the badge shows "unpriced" in a neutral
+grey rather than a letter grade in green/red: a grade computed from an
+incomplete cost figure is exactly the kind of plausible-looking-but-wrong
+number this project exists to avoid, and this is the one surface most
+likely to sit unattended on someone's public README.
 """
 
 from __future__ import annotations
@@ -26,6 +32,7 @@ _GRADE_COLORS = {
     "D": "#e36209",
     "F": "#cb2431",
 }
+_UNPRICED_COLOR = "#9f9f9f"
 _LABEL_BG = "#555555"
 _CHAR_WIDTH = 6.5
 _PADDING = 10
@@ -45,12 +52,17 @@ def _dollar_headline(score: Score) -> str:
 def render_badge(report: Report) -> str:
     score = report.score
     label = escape("⚡ Token Efficiency")
-    value = escape(f"{score.grade} ({score.efficiency}) · {_dollar_headline(score)}")
+    if report.unpriced_calls:
+        call_word = "call" if report.unpriced_calls == 1 else "calls"
+        value = escape(f"⚠ unpriced ({report.unpriced_calls} {call_word})")
+        color = _UNPRICED_COLOR
+    else:
+        value = escape(f"{score.grade} ({score.efficiency}) · {_dollar_headline(score)}")
+        color = _GRADE_COLORS.get(score.grade, _GRADE_COLORS["F"])
 
     label_width = _text_width(label)
     value_width = _text_width(value)
     total_width = label_width + value_width
-    color = _GRADE_COLORS.get(score.grade, _GRADE_COLORS["F"])
 
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'

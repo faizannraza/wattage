@@ -84,6 +84,11 @@ _TEMPLATE = r"""<!DOCTYPE html>
     border-radius: 999px; background: var(--neutral-frame); font-size: 13px;
   }
   .score-chip b { font-size: 15px; }
+  .score-chip.unpriced { background: var(--status-warning); color: #3a2a00; }
+  .unpriced-banner {
+    padding: 10px 24px; font-size: 13px; background: var(--status-warning); color: #3a2a00;
+    border-bottom: 1px solid var(--border);
+  }
   button.theme-toggle {
     border: 1px solid var(--border); background: var(--surface-1); color: var(--ink-1);
     border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer;
@@ -135,11 +140,12 @@ _TEMPLATE = r"""<!DOCTYPE html>
 </style>
 </head>
 <body>
+__UNPRICED_BANNER__
 <header>
   <h1>&#9889; wattage &mdash; burn map</h1>
   <span class="source">__SOURCE__</span>
   <div class="spacer"></div>
-  <div class="score-chip"><b>__GRADE__ (__EFFICIENCY__)</b> &middot; $__RECOVERABLE__ recoverable</div>
+  <div class="__SCORE_CHIP_CLASS__">__SCORE_CHIP_CONTENT__</div>
   <button class="theme-toggle" onclick="toggleTheme()">&#9788;/&#9789; theme</button>
 </header>
 <main>
@@ -311,16 +317,43 @@ renderLegend();
 """
 
 
+def _score_chip(report: Report) -> tuple[str, str]:
+    """(css_class, inner_html) for the header's score pill -- a grade
+    computed from an incomplete cost figure is exactly the kind of
+    plausible-looking-but-wrong number this project exists to avoid, so an
+    unpriced trace gets a distinct warning pill instead of a letter grade."""
+    if report.unpriced_calls:
+        call_word = "call" if report.unpriced_calls == 1 else "calls"
+        content = f"<b>&#9888; unpriced</b> ({report.unpriced_calls} {escape(call_word)})"
+        return "score-chip unpriced", content
+    score = report.score
+    content = f"<b>{escape(score.grade)} ({score.efficiency})</b> &middot; ${score.recoverable_dollars:.2f} recoverable"
+    return "score-chip", content
+
+
+def _unpriced_banner(report: Report) -> str:
+    if not report.unpriced_calls:
+        return ""
+    call_word = "call" if report.unpriced_calls == 1 else "calls"
+    models = escape(", ".join(report.unpriced_models))
+    return (
+        '<div class="unpriced-banner">&#9888; '
+        f"{report.unpriced_calls} {call_word} could not be priced (no registry entry for "
+        f"{models}) &mdash; total cost and score are incomplete.</div>"
+    )
+
+
 def render_html(trace: Trace, report: Report) -> str:
     tree = build_tree(trace)
     findings_html = _render_findings(report)
+    score_chip_class, score_chip_content = _score_chip(report)
 
     html = _TEMPLATE
     html = html.replace("__TITLE__", escape(f"wattage burn map — {report.trace_source}"))
     html = html.replace("__SOURCE__", escape(report.trace_source))
-    html = html.replace("__GRADE__", escape(report.score.grade))
-    html = html.replace("__EFFICIENCY__", str(report.score.efficiency))
-    html = html.replace("__RECOVERABLE__", f"{report.score.recoverable_dollars:.2f}")
+    html = html.replace("__UNPRICED_BANNER__", _unpriced_banner(report))
+    html = html.replace("__SCORE_CHIP_CLASS__", score_chip_class)
+    html = html.replace("__SCORE_CHIP_CONTENT__", score_chip_content)
     html = html.replace("__FINDING_COUNT__", str(len(report.findings)))
     html = html.replace("__FINDINGS_HTML__", findings_html)
     html = html.replace("__PRICING_VERSION__", escape(report.pricing_version))
@@ -330,6 +363,12 @@ def render_html(trace: Trace, report: Report) -> str:
 
 
 def _render_findings(report: Report) -> str:
+    if not report.findings and report.unpriced_calls:
+        return (
+            '<p class="no-findings">No findings on the priced portion of this trace — '
+            f"{report.unpriced_calls} call(s) could not be priced, so this is not a "
+            "confirmed-efficient trace.</p>"
+        )
     if not report.findings:
         return '<p class="no-findings">No findings — this trace looks efficient.</p>'
 

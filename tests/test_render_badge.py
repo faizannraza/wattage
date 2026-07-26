@@ -3,7 +3,12 @@ from wattage.render.badge import render_badge
 
 
 def _report(
-    grade: str, efficiency: int, recoverable: float, monthly: float | None = None
+    grade: str,
+    efficiency: int,
+    recoverable: float,
+    monthly: float | None = None,
+    unpriced_calls: int = 0,
+    unpriced_models: list[str] | None = None,
 ) -> Report:
     return Report(
         trace_source="t.json",
@@ -21,6 +26,8 @@ def _report(
         ),
         pricing_version="v",
         generated_at="2026-01-01T00:00:00Z",
+        unpriced_calls=unpriced_calls,
+        unpriced_models=unpriced_models or [],
     )
 
 
@@ -65,3 +72,23 @@ def test_badge_escapes_grade_safely() -> None:
     # produce invalid XML even if a caller passes something unexpected.
     svg = render_badge(_report("A", 100, 0.0))
     assert "&amp;" not in svg  # nothing to escape in the normal path
+
+
+def test_unpriced_trace_shows_unpriced_not_a_letter_grade() -> None:
+    """A grade computed from an incomplete cost figure is exactly the kind
+    of plausible-looking-but-wrong number this project exists to avoid --
+    the badge must never show a letter grade when any call was unpriced,
+    since this is the one surface most likely to sit unattended on
+    someone's public README."""
+    svg = render_badge(_report("A", 100, 0.0, unpriced_calls=1, unpriced_models=["openai/gpt-4o"]))
+    assert "unpriced" in svg
+    assert "1 call" in svg
+    assert "A (100)" not in svg
+    assert "#9f9f9f" in svg  # neutral grey, not a grade color
+
+
+def test_unpriced_trace_pluralizes_call_count() -> None:
+    svg = render_badge(
+        _report("A", 100, 0.0, unpriced_calls=2, unpriced_models=["openai/gpt-4o", "google/gemini"])
+    )
+    assert "2 calls" in svg

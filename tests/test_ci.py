@@ -192,6 +192,9 @@ def test_unpriced_model_returns_exit_code_4(tmp_path: Path) -> None:
         result = run_ci(str(trace_path), baseline_path=str(tmp_path / "baseline.json"))
     assert result.exit_code == EXIT_PRICING_ERROR
     assert any("no pricing entry" in r for r in result.reasons)
+    assert any("mystery-corp/ghost-model-9000" in r for r in result.reasons)
+    assert result.report is not None
+    assert result.report.unpriced_models == ["mystery-corp/ghost-model-9000"]
 
 
 def test_exit_code_constants_match_the_doc_table() -> None:

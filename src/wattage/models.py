@@ -198,3 +198,7 @@ class Report(BaseModel):
     # Surfaced so CI can fail loudly (doc §11.3 exit code 4) instead of
     # silently gating on a cost figure known to be incomplete.
     unpriced_calls: int = 0
+    # The distinct "provider/model" strings behind those unpriced calls
+    # (sorted, deduplicated) — so a renderer can say *which* model has no
+    # registry entry, not just that something was missed.
+    unpriced_models: list[str] = Field(default_factory=list)

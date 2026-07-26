@@ -128,11 +128,12 @@ def run_ci(
         )
 
     if report.unpriced_calls > 0:
+        models = ", ".join(report.unpriced_models)
         return CIResult(
             exit_code=EXIT_PRICING_ERROR,
             report=report,
             reasons=[
-                f"{report.unpriced_calls} call(s) had no pricing entry — "
+                f"{report.unpriced_calls} call(s) had no pricing entry ({models}) — "
                 "supply a --pricing override or the cost comparison would be an undercount"
             ],
         )

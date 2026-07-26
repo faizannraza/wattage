@@ -140,3 +140,44 @@ def test_three_detectors_fire_and_aggregate_consistently(integration_trace_path:
     # All three findings are quality_risk none/low, so waste_ratio counts all of them.
     assert report.score.waste_ratio == pytest.approx(expected_recoverable / expected_total)
     assert report.score.grade == "F"
+
+
+def test_unpriced_calls_are_counted_and_named_without_corrupting_priced_totals(
+    tmp_path: Path,
+) -> None:
+    """A mixed trace -- one real, priced call and one call using a model
+    with no pricing-registry entry -- must count and name the unpriced one
+    (Report.unpriced_calls / unpriced_models) while total_dollars still
+    reflects only the genuinely priced portion, not a guess."""
+    spans = [
+        _chat("priced-1", "", input_tok=1000, output_tok=100, start=0, end=1),
+        {
+            "traceId": "trace-mixed",
+            "spanId": "unpriced-1",
+            "parentSpanId": "",
+            "name": "chat gpt-4o",
+            "startTimeUnixNano": "2",
+            "endTimeUnixNano": "3",
+            "attributes": [
+                _attr("gen_ai.provider.name", "openai"),
+                _attr("gen_ai.request.model", "gpt-4o"),
+                _attr("gen_ai.usage.input_tokens", 5000),
+                _attr("gen_ai.usage.output_tokens", 2000),
+            ],
+        },
+    ]
+    payload = {"resourceSpans": [{"scopeSpans": [{"spans": spans}]}]}
+    path = tmp_path / "mixed_trace.json"
+    path.write_text(json.dumps(payload))
+
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        report = build_report(str(path))
+
+    assert report.unpriced_calls == 1
+    assert report.unpriced_models == ["openai/gpt-4o"]
+    # total_dollars reflects only the priced call (1000*3e-6 + 100*15e-6),
+    # never a guessed rate for the unpriced one.
+    assert report.total_dollars == pytest.approx(1000 * 3.0e-6 + 100 * 15.0e-6)

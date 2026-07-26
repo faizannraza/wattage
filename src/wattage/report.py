@@ -66,6 +66,7 @@ def build_trace_and_report(
     }
     total_dollars = 0.0
     unpriced_calls = 0
+    unpriced_models: set[str] = set()
 
     # Price every call first: detectors (cache_gap, prefix_churn's ratio-based
     # severity) read call.cost, so pricing must happen before detection runs.
@@ -81,6 +82,7 @@ def build_trace_and_report(
                 total_dollars += call.cost.total
                 if call.cost.unpriced:
                     unpriced_calls += 1
+                    unpriced_models.add(f"{call.provider}/{call.model}")
 
     # Built once and shared: retrieval_thrash (Phase 2.10) reuses the same
     # embedder instance rather than each detector loading its own model.
@@ -113,5 +115,6 @@ def build_trace_and_report(
         pricing_version=registry.version,
         generated_at=datetime.now(timezone.utc).isoformat(),
         unpriced_calls=unpriced_calls,
+        unpriced_models=sorted(unpriced_models),
     )
     return trace, report

@@ -31,6 +31,13 @@ def render_terminal(report: Report, console: Console | None = None) -> None:
     )
     if not report.score.quality_measured:
         headline += "\n[dim]quality: unmeasured[/dim]"
+    if report.unpriced_calls:
+        models = ", ".join(report.unpriced_models)
+        warning = (
+            f"[bold yellow]⚠ {report.unpriced_calls} call(s) unpriced[/bold yellow] "
+            f"(no registry entry for {models}) — cost and score below are incomplete"
+        )
+        headline = f"{warning}\n{headline}"
     console.print(Panel(headline, title=f"⚡ wattage — {report.trace_source}", expand=False))
 
     table = Table(title="Token breakdown")
@@ -49,6 +56,12 @@ def render_terminal(report: Report, console: Console | None = None) -> None:
         for f in report.findings:
             findings_table.add_row(f.id, f.severity.value, format_dollars(f.wasted_dollars), f.fix)
         console.print(findings_table)
+    elif report.unpriced_calls:
+        console.print(
+            "[dim]No findings on the priced portion of this trace — "
+            f"{report.unpriced_calls} call(s) could not be priced, so this is not "
+            "a confirmed-efficient trace.[/dim]"
+        )
     else:
         console.print("[dim]No findings — this trace looks efficient.[/dim]")
 
