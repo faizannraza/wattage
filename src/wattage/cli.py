@@ -1,9 +1,13 @@
+import json
+from collections.abc import Callable
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, TypeVar
 
 import typer
+import yaml
 
 from wattage import __version__
+from wattage.adapters.base import AdapterError
 from wattage.ci import CIConfigError, parse_fail_on, run_ci
 from wattage.config import WattageConfig, WattageConfigError, load_config
 from wattage.render.badge import render_badge
@@ -39,6 +43,23 @@ def _load_config_or_exit(config_path: Path | None) -> WattageConfig:
         raise typer.Exit(code=2) from exc
 
 
+_T = TypeVar("_T")
+
+
+def _input_errors_or_exit(build: Callable[[], _T]) -> _T:
+    """report/score/badge have no documented multi-code exit contract like
+    `ci` does, so a bad --source/--pricing/--quality file just needs a
+    clean message instead of `ci`'s carefully-scoped 0-4 codes -- a raw
+    Python traceback for a missing or malformed file is not launch-quality
+    UX, and `ci` already gets this right for the same underlying errors.
+    """
+    try:
+        return build()
+    except (OSError, json.JSONDecodeError, yaml.YAMLError, AdapterError) as exc:
+        typer.echo(f"error: {exc}", err=True)
+        raise typer.Exit(code=1) from exc
+
+
 @app.callback()
 def main(
     version: bool = typer.Option(
@@ -72,20 +93,24 @@ def report(
     """Ingest a trace and print a priced, findings-quantified report."""
     cfg = _load_config_or_exit(config)
     if html_output is not None:
-        trace, report_obj = build_trace_and_report(
+        trace, report_obj = _input_errors_or_exit(
+            lambda: build_trace_and_report(
+                str(source),
+                pricing_override=str(pricing) if pricing else None,
+                config=cfg,
+                quality_file=str(quality) if quality else None,
+            )
+        )
+        html_output.write_text(render_html(trace, report_obj), encoding="utf-8")
+        typer.echo(f"wrote {html_output}")
+        return
+    report_obj = _input_errors_or_exit(
+        lambda: build_report(
             str(source),
             pricing_override=str(pricing) if pricing else None,
             config=cfg,
             quality_file=str(quality) if quality else None,
         )
-        html_output.write_text(render_html(trace, report_obj), encoding="utf-8")
-        typer.echo(f"wrote {html_output}")
-        return
-    report_obj = build_report(
-        str(source),
-        pricing_override=str(pricing) if pricing else None,
-        config=cfg,
-        quality_file=str(quality) if quality else None,
     )
     if json_output:
         typer.echo(render_json(report_obj))
@@ -105,11 +130,13 @@ def score(
 ) -> None:
     """Print just the Token Efficiency score and dollar headline."""
     cfg = _load_config_or_exit(config)
-    report_obj = build_report(
-        str(source),
-        pricing_override=str(pricing) if pricing else None,
-        config=cfg,
-        quality_file=str(quality) if quality else None,
+    report_obj = _input_errors_or_exit(
+        lambda: build_report(
+            str(source),
+            pricing_override=str(pricing) if pricing else None,
+            config=cfg,
+            quality_file=str(quality) if quality else None,
+        )
     )
     if report_obj.unpriced_calls:
         call_word = "call" if report_obj.unpriced_calls == 1 else "calls"
@@ -138,11 +165,13 @@ def badge(
 ) -> None:
     """Emit a Token Efficiency SVG badge."""
     cfg = _load_config_or_exit(config)
-    report_obj = build_report(
-        str(source),
-        pricing_override=str(pricing) if pricing else None,
-        config=cfg,
-        quality_file=str(quality) if quality else None,
+    report_obj = _input_errors_or_exit(
+        lambda: build_report(
+            str(source),
+            pricing_override=str(pricing) if pricing else None,
+            config=cfg,
+            quality_file=str(quality) if quality else None,
+        )
     )
     svg = render_badge(report_obj)
     if out is not None:

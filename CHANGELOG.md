@@ -7,6 +7,17 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **`report`/`score`/`badge` dumped raw Python tracebacks for ordinary
+  input errors.** Unlike `wattage ci`, these three commands caught nothing
+  around ingestion — a missing or malformed `--source` trace, a malformed
+  `--pricing` override (invalid YAML), or a malformed `--quality` map
+  (invalid JSON) all produced a full Rich-rendered traceback instead of a
+  clean message. Reproduced all four cases. Fixed: a shared
+  `_input_errors_or_exit()` helper catches `OSError`/
+  `json.JSONDecodeError`/`yaml.YAMLError`/`AdapterError` around
+  `build_report`/`build_trace_and_report` in all three commands, printing
+  a one-line `error: ...` message to stderr and exiting 1 — matching the
+  polish `ci` already had for the same underlying errors.
 - **The HTML flame graph could corrupt itself via a template-placeholder
   collision in trace content.** `render_html` substituted its template
   tokens (`__TREE_JSON__`, `__FINDINGS_HTML__`, etc.) with sequential

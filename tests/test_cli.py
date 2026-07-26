@@ -329,6 +329,69 @@ def test_config_flag_missing_file_is_a_clean_exit_code_2(tmp_path: Path) -> None
     assert result.exit_code == 2
 
 
+@pytest.mark.parametrize("command", ["report", "score", "badge"])
+def test_missing_source_file_is_a_clean_error_not_a_traceback(command: str, tmp_path: Path) -> None:
+    """The real bug this closes: report/score/badge didn't catch anything
+    around ingestion, unlike `ci`, so a missing or malformed --source/
+    --pricing/--quality file dumped a full Python traceback instead of a
+    one-line message and a clean nonzero exit code."""
+    result = runner.invoke(app, [command, str(tmp_path / "does_not_exist.json")])
+
+    assert result.exit_code == 1
+    assert result.exception is not None
+    assert not isinstance(result.exception, FileNotFoundError)
+
+
+def test_malformed_trace_via_report_is_a_clean_error_not_a_traceback(tmp_path: Path) -> None:
+    trace_path = tmp_path / "missing_span_id.json"
+    trace_path.write_text(
+        json.dumps(
+            {"resourceSpans": [{"scopeSpans": [{"spans": [{"traceId": "t1", "name": "chat"}]}]}]}
+        )
+    )
+
+    result = runner.invoke(app, ["report", str(trace_path)])
+
+    assert result.exit_code == 1
+    assert not isinstance(result.exception, KeyError)
+
+
+def test_malformed_pricing_override_via_report_is_a_clean_error_not_a_traceback(
+    tmp_path: Path,
+) -> None:
+    bad_pricing = tmp_path / "bad_pricing.yaml"
+    bad_pricing.write_text("not: valid: yaml: [")
+
+    result = runner.invoke(
+        app,
+        [
+            "report",
+            str(REPO_ROOT / "examples" / "sample_trace.json"),
+            "--pricing",
+            str(bad_pricing),
+        ],
+    )
+
+    assert result.exit_code == 1
+
+
+def test_malformed_quality_map_via_score_is_a_clean_error_not_a_traceback(tmp_path: Path) -> None:
+    bad_quality = tmp_path / "bad_quality.json"
+    bad_quality.write_text("not json")
+
+    result = runner.invoke(
+        app,
+        [
+            "score",
+            str(REPO_ROOT / "examples" / "sample_trace.json"),
+            "--quality",
+            str(bad_quality),
+        ],
+    )
+
+    assert result.exit_code == 1
+
+
 def test_badge_command_prints_svg_to_stdout() -> None:
     result = runner.invoke(app, ["badge", str(REPO_ROOT / "examples" / "sample_trace.json")])
     assert result.exit_code == 0
