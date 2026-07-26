@@ -7,6 +7,18 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **A negative token count silently subtracted from `total_dollars`.**
+  `normalize.py`'s attribute parser accepted any integer for
+  `gen_ai.usage.{input,output,cache_read_input,cache_creation_input,
+  reasoning}_tokens`, including negative ones — which can only come from a
+  corrupted or adversarially-crafted trace, never a real provider response
+  — and passed it straight through into the cost calculation with no
+  warning, understating the total. Reproduced: `input_tokens: -100`
+  produced a `total_dollars` silently reduced by `100 * price.input`.
+  Fixed: negative token counts now raise `AdapterError` (the same
+  malformed-trace-shape signal used elsewhere), naming the specific field
+  — caught by the same ingestion-error handling `ci`/`report`/`score`/
+  `badge` already have for every other malformed-trace case.
 - **An empty trace rendered a confident, fake "A (100)" grade.** A trace
   with zero sessions (e.g. `{"resourceSpans": []}`) built a perfectly
   normal-looking `Report` — "A (100)", "$0.0000", "this trace looks

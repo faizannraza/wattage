@@ -1,9 +1,70 @@
+import pytest
+
+from wattage.adapters.base import AdapterError
 from wattage.models import RawSpan, SpanKind
-from wattage.normalize import normalize_retrieval_call
+from wattage.normalize import normalize_llm_call, normalize_retrieval_call
 
 
 def _span(attributes: dict) -> RawSpan:
     return RawSpan(span_id="s0", name="embeddings", kind=SpanKind.embeddings, attributes=attributes)
+
+
+def _chat_span(attributes: dict) -> RawSpan:
+    return RawSpan(span_id="s0", name="chat", kind=SpanKind.chat, attributes=attributes)
+
+
+def test_negative_input_tokens_raises_instead_of_silently_subtracting_cost() -> None:
+    """The real bug this closes: a negative token count (only possible from
+    a corrupted or adversarially-crafted trace -- no real provider
+    response reports one) passed straight through into TokenUsage and
+    silently subtracted from total_dollars, with no warning -- exactly the
+    kind of plausible-looking-but-wrong number this project exists to
+    avoid."""
+    span = _chat_span(
+        {
+            "gen_ai.provider.name": "anthropic",
+            "gen_ai.request.model": "claude-sonnet-4-6",
+            "gen_ai.usage.input_tokens": -100,
+            "gen_ai.usage.output_tokens": 50,
+        }
+    )
+    with pytest.raises(AdapterError, match="gen_ai.usage.input_tokens cannot be negative"):
+        normalize_llm_call(span)
+
+
+@pytest.mark.parametrize(
+    "field",
+    [
+        "gen_ai.usage.input_tokens",
+        "gen_ai.usage.output_tokens",
+        "gen_ai.usage.cache_read_input_tokens",
+        "gen_ai.usage.cache_creation_input_tokens",
+        "gen_ai.usage.reasoning_tokens",
+    ],
+)
+def test_negative_tokens_raises_for_every_usage_field(field: str) -> None:
+    span = _chat_span(
+        {
+            "gen_ai.provider.name": "anthropic",
+            "gen_ai.request.model": "claude-sonnet-4-6",
+            field: -1,
+        }
+    )
+    with pytest.raises(AdapterError, match="cannot be negative"):
+        normalize_llm_call(span)
+
+
+def test_zero_and_absent_token_counts_are_unaffected() -> None:
+    span = _chat_span(
+        {
+            "gen_ai.provider.name": "anthropic",
+            "gen_ai.request.model": "claude-sonnet-4-6",
+            "gen_ai.usage.input_tokens": 0,
+        }
+    )
+    call = normalize_llm_call(span)
+    assert call.usage.input == 0
+    assert call.usage.output == 0  # absent -> defaults to 0, not an error
 
 
 def test_chunks_populated_from_json_encoded_string_of_plain_text() -> None:

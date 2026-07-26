@@ -6,11 +6,23 @@ import hashlib
 import json
 from typing import Any
 
+from wattage.adapters.base import AdapterError
 from wattage.models import LLMCall, RawSpan, RetrievalCall, TokenUsage, ToolCall
 
 
-def _as_int(value: Any) -> int:
-    return int(value) if value is not None else 0
+def _as_token_count(value: Any, field: str) -> int:
+    """A negative token count can't come from a real provider response --
+    only from a corrupted or adversarially-crafted trace -- and would
+    otherwise silently subtract from total_dollars with no warning,
+    exactly the "plausible-looking-but-wrong number" this project exists
+    to avoid. Treated the same as any other malformed trace shape.
+    """
+    if value is None:
+        return 0
+    parsed = int(value)
+    if parsed < 0:
+        raise AdapterError(f"{field} cannot be negative, got {parsed}")
+    return parsed
 
 
 def _stringify(value: Any) -> str | None:
@@ -39,11 +51,18 @@ def normalize_llm_call(span: RawSpan) -> LLMCall:
     a = span.attributes
     provider, model = _provider_and_model(a)
     usage = TokenUsage(
-        input=_as_int(a.get("gen_ai.usage.input_tokens")),
-        output=_as_int(a.get("gen_ai.usage.output_tokens")),
-        cache_read=_as_int(a.get("gen_ai.usage.cache_read_input_tokens")),
-        cache_creation=_as_int(a.get("gen_ai.usage.cache_creation_input_tokens")),
-        reasoning=_as_int(a.get("gen_ai.usage.reasoning_tokens")),
+        input=_as_token_count(a.get("gen_ai.usage.input_tokens"), "gen_ai.usage.input_tokens"),
+        output=_as_token_count(a.get("gen_ai.usage.output_tokens"), "gen_ai.usage.output_tokens"),
+        cache_read=_as_token_count(
+            a.get("gen_ai.usage.cache_read_input_tokens"), "gen_ai.usage.cache_read_input_tokens"
+        ),
+        cache_creation=_as_token_count(
+            a.get("gen_ai.usage.cache_creation_input_tokens"),
+            "gen_ai.usage.cache_creation_input_tokens",
+        ),
+        reasoning=_as_token_count(
+            a.get("gen_ai.usage.reasoning_tokens"), "gen_ai.usage.reasoning_tokens"
+        ),
     )
     return LLMCall(
         span_id=span.span_id,

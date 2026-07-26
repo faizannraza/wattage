@@ -373,6 +373,53 @@ def test_malformed_trace_via_report_is_a_clean_error_not_a_traceback(tmp_path: P
     assert not isinstance(result.exception, KeyError)
 
 
+def test_negative_token_count_via_report_is_a_clean_error(tmp_path: Path) -> None:
+    trace_path = tmp_path / "negative_tokens.json"
+    trace_path.write_text(
+        json.dumps(
+            {
+                "resourceSpans": [
+                    {
+                        "scopeSpans": [
+                            {
+                                "spans": [
+                                    {
+                                        "traceId": "t1",
+                                        "spanId": "s1",
+                                        "name": "chat claude-sonnet-4-6",
+                                        "attributes": [
+                                            {
+                                                "key": "gen_ai.provider.name",
+                                                "value": {"stringValue": "anthropic"},
+                                            },
+                                            {
+                                                "key": "gen_ai.request.model",
+                                                "value": {"stringValue": "claude-sonnet-4-6"},
+                                            },
+                                            {
+                                                "key": "gen_ai.usage.input_tokens",
+                                                "value": {"intValue": "-100"},
+                                            },
+                                            {
+                                                "key": "gen_ai.usage.output_tokens",
+                                                "value": {"intValue": "50"},
+                                            },
+                                        ],
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        )
+    )
+
+    result = runner.invoke(app, ["report", str(trace_path)])
+
+    assert result.exit_code == 1
+
+
 def test_malformed_pricing_override_via_report_is_a_clean_error_not_a_traceback(
     tmp_path: Path,
 ) -> None:
