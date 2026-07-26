@@ -7,6 +7,20 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Pinning the GitHub Action didn't actually pin the analysis engine.**
+  `action.yml` ran `uv tool install wattage --quiet` — unpinned, so it
+  always installed whatever was newest on PyPI regardless of which tag a
+  workflow pinned (`uses: faizannraza/wattage/action@v0.1.0`). A workflow
+  that had deliberately pinned to an old, known-good tag (docs/ci.md's own
+  stated reason: "a future Wattage release can't silently change what your
+  existing workflows run") could still get a newer engine version's
+  scoring/detector changes without warning. Fixed: installs from
+  `$(dirname github.action_path)` instead — `github.action_path` is this
+  action's own checkout at the exact ref the workflow pinned, one
+  directory up from `action.yml` is the package root — so the installed
+  version is tied to the pinned ref by construction, not by a
+  manually-maintained version string that could drift out of sync at the
+  next release.
 - **`prefix_churn` could recommend a fix that wouldn't work.**
   `min_cacheable_prefix_tokens` was parsed from the pricing registry into
   every `ModelPrice` (1024 tokens for most vendored models, 4096 for
