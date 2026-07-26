@@ -7,6 +7,26 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **The convergence engine barely fired on real, complete agent traces.**
+  Found by an independent adversarial review, then confirmed with two
+  separate empirical reproductions: `nonconvergence` exempted a loop's
+  entire classification whenever its last iteration was a plain chat
+  response with no pending tool call (`Loop.reached_success`) — which is
+  structurally indistinguishable from an agent that thrashed the whole
+  time and then simply gave up with an uninformative final answer (real
+  message content isn't captured by the adapter). Worse, the underlying
+  signal computation itself treated an empty-content final iteration as
+  "productive" via the embedder's neutral no-signal fallback, independent
+  of that gate. Since real agents almost always end with *some* final
+  text, this meant the detector only reliably fired on traces cut off
+  mid-tool-call — not the far more common "burned money thrashing, then
+  gave up" shape. Fixed at the signal level: an iteration with no genuine
+  observable content can no longer be credited as evidence a loop
+  recovered, and the `reached_success` short-circuit was removed
+  entirely. Validated against the flagship F1 1.00 vs. 0.25 benchmark
+  (unchanged), all 10 hand-verified fixtures (unchanged), and all three
+  of this release's real-world test scenarios (byte-identical results) —
+  zero regression, only the previously-invisible case now fires.
 - **`recoverable_dollars` could exceed a trace's own total cost.** Detectors
   that legitimately flag the same underlying calls from different angles
   (e.g. `prefix_churn` and `nonconvergence` on a stalled loop) were summed
@@ -59,11 +79,16 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `WATTAGE_BUILD_DOC.md` dropped from git tracking (kept locally) — an
   internal planning document, not part of the public-facing repo.
 
-All of the above were found and verified via a rigorous testing pass
+Most of the above were found and verified via a rigorous testing pass
 against 3 large, realistic multi-agent scenarios (customer-support
 orchestration, a 22-iteration autonomous coding-agent loop, and a
 3-level-deep nested RAG research system) run end-to-end through the real
-pipeline — not synthetic unit fixtures alone.
+pipeline — not synthetic unit fixtures alone. These traces, their
+generator scripts, and the ground-truth spec they were checked against are
+committed in `benchmarks/scenarios/` — reproducible, not an unfalsifiable
+claim. The convergence engine fix came from a follow-up independent
+adversarial review (deliberately run on a different model with zero prior
+context) and two further empirical reproductions before any code changed.
 
 ## [0.1.0] — first public release
 

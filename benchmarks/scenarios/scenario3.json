@@ -1,0 +1,1395 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "research-agent"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "research-agent"
+          },
+          "spans": [
+            {
+              "spanId": "orphan-c0",
+              "parentSpanId": "",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "0",
+              "endTimeUnixNano": "400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "800"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "100"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.cache_creation_input_tokens",
+                  "value": {
+                    "intValue": "500"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "orphan-c1",
+              "parentSpanId": "",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "500000000",
+              "endTimeUnixNano": "900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "850"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "90"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.cache_read_input_tokens",
+                  "value": {
+                    "intValue": "500"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "orchestrator",
+              "parentSpanId": "",
+              "traceId": "trace-research-001",
+              "name": "invoke_agent orchestrator",
+              "startTimeUnixNano": "1000000000",
+              "endTimeUnixNano": "21000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "orchestrator"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "orch-c0",
+              "parentSpanId": "orchestrator",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "1000000000",
+              "endTimeUnixNano": "1400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "600"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "80"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.cache_creation_input_tokens",
+                  "value": {
+                    "intValue": "1200"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "orch-c1",
+              "parentSpanId": "orchestrator",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "1500000000",
+              "endTimeUnixNano": "1900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "650"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "70"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "orch-c2",
+              "parentSpanId": "orchestrator",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "2000000000",
+              "endTimeUnixNano": "2400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "700"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "90"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "research-lead",
+              "parentSpanId": "orchestrator",
+              "traceId": "trace-research-001",
+              "name": "invoke_agent research-lead",
+              "startTimeUnixNano": "2500000000",
+              "endTimeUnixNano": "20500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "research-lead"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "rl-c0",
+              "parentSpanId": "research-lead",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "2500000000",
+              "endTimeUnixNano": "2900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "900"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "200"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "sub-agent-a",
+              "parentSpanId": "research-lead",
+              "traceId": "trace-research-001",
+              "name": "invoke_agent sub-agent-a",
+              "startTimeUnixNano": "3000000000",
+              "endTimeUnixNano": "9000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "sub-agent-a"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "suba-l0",
+              "parentSpanId": "sub-agent-a",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "3000000000",
+              "endTimeUnixNano": "3300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "400"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "70"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "suba-t0",
+              "parentSpanId": "sub-agent-a",
+              "traceId": "trace-research-001",
+              "name": "execute_tool search_web",
+              "startTimeUnixNano": "3300000000",
+              "endTimeUnixNano": "3600000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_web"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"query\": \"climate policy renewable subsidies\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "No relevant results found."
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "suba-l1",
+              "parentSpanId": "sub-agent-a",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "3900000000",
+              "endTimeUnixNano": "4200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "400"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "70"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "suba-t1",
+              "parentSpanId": "sub-agent-a",
+              "traceId": "trace-research-001",
+              "name": "execute_tool search_web",
+              "startTimeUnixNano": "4200000000",
+              "endTimeUnixNano": "4500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_web"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"query\": \"renewable subsidies climate policy\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "No relevant results found."
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "suba-l2",
+              "parentSpanId": "sub-agent-a",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "4800000000",
+              "endTimeUnixNano": "5100000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "400"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "70"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "suba-t2",
+              "parentSpanId": "sub-agent-a",
+              "traceId": "trace-research-001",
+              "name": "execute_tool search_web",
+              "startTimeUnixNano": "5100000000",
+              "endTimeUnixNano": "5400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_web"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"query\": \"climate subsidies policy renewable\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "No relevant results found."
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "suba-l3",
+              "parentSpanId": "sub-agent-a",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "5700000000",
+              "endTimeUnixNano": "6000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "400"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "70"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "suba-t3",
+              "parentSpanId": "sub-agent-a",
+              "traceId": "trace-research-001",
+              "name": "execute_tool search_web",
+              "startTimeUnixNano": "6000000000",
+              "endTimeUnixNano": "6300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_web"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"query\": \"policy climate renewable subsidies\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "No relevant results found."
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "suba-l4",
+              "parentSpanId": "sub-agent-a",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "6600000000",
+              "endTimeUnixNano": "6900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "400"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "70"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "suba-t4",
+              "parentSpanId": "sub-agent-a",
+              "traceId": "trace-research-001",
+              "name": "execute_tool search_web",
+              "startTimeUnixNano": "6900000000",
+              "endTimeUnixNano": "7200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_web"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"query\": \"subsidies renewable climate policy\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "No relevant results found."
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "sub-agent-b",
+              "parentSpanId": "research-lead",
+              "traceId": "trace-research-001",
+              "name": "invoke_agent sub-agent-b",
+              "startTimeUnixNano": "9100000000",
+              "endTimeUnixNano": "13100000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "sub-agent-b"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "subb-l0",
+              "parentSpanId": "sub-agent-b",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "9100000000",
+              "endTimeUnixNano": "9400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "500"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "90"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "subb-t0",
+              "parentSpanId": "sub-agent-b",
+              "traceId": "trace-research-001",
+              "name": "execute_tool search_web",
+              "startTimeUnixNano": "9400000000",
+              "endTimeUnixNano": "9700000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_web"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"q\": \"asyncio deadlock\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "Common causes: awaiting a lock already held by the same task."
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "subb-l1",
+              "parentSpanId": "sub-agent-b",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "10000000000",
+              "endTimeUnixNano": "10300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "700"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "90"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "subb-t1",
+              "parentSpanId": "sub-agent-b",
+              "traceId": "trace-research-001",
+              "name": "execute_tool search_web",
+              "startTimeUnixNano": "10300000000",
+              "endTimeUnixNano": "10600000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_web"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"q\": \"asyncio double lock same task\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "Reentrant asyncio.Lock isn't supported; use asyncio.Semaphore instead."
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "subb-l2",
+              "parentSpanId": "sub-agent-b",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "10900000000",
+              "endTimeUnixNano": "11300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "1000"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "150"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summarizer",
+              "parentSpanId": "research-lead",
+              "traceId": "trace-research-001",
+              "name": "invoke_agent summarizer",
+              "startTimeUnixNano": "13200000000",
+              "endTimeUnixNano": "20200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "summarizer"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-l0",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "13200000000",
+              "endTimeUnixNano": "13500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "1800"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "25"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-t0",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "execute_tool summarize_chunk",
+              "startTimeUnixNano": "13500000000",
+              "endTimeUnixNano": "13800000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "summarize_chunk"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"chunk_id\": 0}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "chunk summary: no new information beyond prior summary"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-l1",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "13900000000",
+              "endTimeUnixNano": "14200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "2300"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "25"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-t1",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "execute_tool summarize_chunk",
+              "startTimeUnixNano": "14200000000",
+              "endTimeUnixNano": "14500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "summarize_chunk"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"chunk_id\": 1}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "chunk summary: no new information beyond prior summary"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-l2",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "14600000000",
+              "endTimeUnixNano": "14900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "2800"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "25"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-t2",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "execute_tool summarize_chunk",
+              "startTimeUnixNano": "14900000000",
+              "endTimeUnixNano": "15200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "summarize_chunk"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"chunk_id\": 2}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "chunk summary: no new information beyond prior summary"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-l3",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "15300000000",
+              "endTimeUnixNano": "15600000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "3300"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "25"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-t3",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "execute_tool summarize_chunk",
+              "startTimeUnixNano": "15600000000",
+              "endTimeUnixNano": "15900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "summarize_chunk"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"chunk_id\": 3}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "chunk summary: no new information beyond prior summary"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-l4",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "16000000000",
+              "endTimeUnixNano": "16300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "3800"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "25"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-t4",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "execute_tool summarize_chunk",
+              "startTimeUnixNano": "16300000000",
+              "endTimeUnixNano": "16600000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "summarize_chunk"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"chunk_id\": 4}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "chunk summary: no new information beyond prior summary"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-l5",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "16700000000",
+              "endTimeUnixNano": "17000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "4300"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "25"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "summ-t5",
+              "parentSpanId": "summarizer",
+              "traceId": "trace-research-001",
+              "name": "execute_tool summarize_chunk",
+              "startTimeUnixNano": "17000000000",
+              "endTimeUnixNano": "17300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "summarize_chunk"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"chunk_id\": 5}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "chunk summary: no new information beyond prior summary"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

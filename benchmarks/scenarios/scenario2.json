@@ -1,0 +1,1659 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "coding-agent"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "coding-agent"
+          },
+          "spans": [
+            {
+              "spanId": "c0",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "0",
+              "endTimeUnixNano": "500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "2000"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "120"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t0",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool list_files",
+              "startTimeUnixNano": "500000000",
+              "endTimeUnixNano": "800000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "list_files"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"dir\": \"/repo/src\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "Found 15 files: main.py, utils.py, config.py, auth.py, db.py, ..."
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c1",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "900000000",
+              "endTimeUnixNano": "1400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "2200"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "150"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t1",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool read_file",
+              "startTimeUnixNano": "1400000000",
+              "endTimeUnixNano": "1700000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "read_file"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"path\": \"/repo/src/config.py\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "DATABASE_URL = os.environ['DATABASE_URL']\nDEBUG = False\nMAX_RETRIES = 3"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c2",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "1800000000",
+              "endTimeUnixNano": "2300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "2450"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "180"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t2",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool read_file",
+              "startTimeUnixNano": "2300000000",
+              "endTimeUnixNano": "2600000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "read_file"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"path\": \"/repo/src/auth.py\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "def authenticate(token):\n    return jwt.decode(token, SECRET_KEY, algorithms=['HS256'])"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c3",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "2700000000",
+              "endTimeUnixNano": "3200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "2700"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "140"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t3",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool read_file",
+              "startTimeUnixNano": "3200000000",
+              "endTimeUnixNano": "3500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "read_file"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"path\": \"/repo/src/config.py\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "DATABASE_URL = os.environ['DATABASE_URL']\nDEBUG = False\nMAX_RETRIES = 3"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c4",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "3600000000",
+              "endTimeUnixNano": "4100000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "2950"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "130"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t4",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool grep",
+              "startTimeUnixNano": "4100000000",
+              "endTimeUnixNano": "4400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "grep"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"dir\": \"/repo/src\", \"pattern\": \"TODO\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "3 matches: auth.py:42, db.py:88, main.py:12"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c5",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "4500000000",
+              "endTimeUnixNano": "5000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "3200"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "1600"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t5",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool read_file",
+              "startTimeUnixNano": "5000000000",
+              "endTimeUnixNano": "5300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "read_file"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"path\": \"/repo/README.md\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "# Project overview\nA REST API service with JWT auth and a Postgres backend."
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c6",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "5400000000",
+              "endTimeUnixNano": "5900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "5000"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "55"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.reasoning_tokens",
+                  "value": {
+                    "intValue": "700"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t6",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool analyze_stacktrace",
+              "startTimeUnixNano": "5900000000",
+              "endTimeUnixNano": "6200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "analyze_stacktrace"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"trace_id\": \"exc-991\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "NullPointerException at db.py line 88, triggered by missing null check"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c7",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "6300000000",
+              "endTimeUnixNano": "6800000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "5300"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t7",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "6800000000",
+              "endTimeUnixNano": "7100000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 0}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c8",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "7200000000",
+              "endTimeUnixNano": "7700000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "5700"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t8",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "7700000000",
+              "endTimeUnixNano": "8000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 1}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c9",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "8100000000",
+              "endTimeUnixNano": "8600000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "6100"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t9",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "8600000000",
+              "endTimeUnixNano": "8900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 2}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c10",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "9000000000",
+              "endTimeUnixNano": "9500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "6500"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t10",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "9500000000",
+              "endTimeUnixNano": "9800000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 3}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c11",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "9900000000",
+              "endTimeUnixNano": "10400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "6900"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t11",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "10400000000",
+              "endTimeUnixNano": "10700000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 4}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c12",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "10800000000",
+              "endTimeUnixNano": "11300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "7300"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t12",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "11300000000",
+              "endTimeUnixNano": "11600000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 5}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c13",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "11700000000",
+              "endTimeUnixNano": "12200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "7700"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t13",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "12200000000",
+              "endTimeUnixNano": "12500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 6}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c14",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "12600000000",
+              "endTimeUnixNano": "13100000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "8100"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t14",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "13100000000",
+              "endTimeUnixNano": "13400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 7}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c15",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "13500000000",
+              "endTimeUnixNano": "14000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "8500"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t15",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "14000000000",
+              "endTimeUnixNano": "14300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 8}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c16",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "14400000000",
+              "endTimeUnixNano": "14900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "8900"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t16",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "14900000000",
+              "endTimeUnixNano": "15200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 9}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c17",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "15300000000",
+              "endTimeUnixNano": "15800000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "9300"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t17",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "15800000000",
+              "endTimeUnixNano": "16100000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 10}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c18",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "16200000000",
+              "endTimeUnixNano": "16700000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "9700"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t18",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "16700000000",
+              "endTimeUnixNano": "17000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 11}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c19",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "17100000000",
+              "endTimeUnixNano": "17600000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "10100"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t19",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "17600000000",
+              "endTimeUnixNano": "17900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 12}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c20",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "18000000000",
+              "endTimeUnixNano": "18500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "10500"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t20",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "18500000000",
+              "endTimeUnixNano": "18800000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 13}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c21",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "18900000000",
+              "endTimeUnixNano": "19400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "10900"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "30"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "t21",
+              "parentSpanId": "",
+              "traceId": "trace-coding-001",
+              "name": "execute_tool run_tests",
+              "startTimeUnixNano": "19400000000",
+              "endTimeUnixNano": "19700000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "run_tests"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 14}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "FAILED: 2 tests still failing"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

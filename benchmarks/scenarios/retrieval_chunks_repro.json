@@ -1,0 +1,387 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "rag-agent"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "rag-agent"
+          },
+          "spans": [
+            {
+              "spanId": "rag-agent",
+              "parentSpanId": "",
+              "traceId": "trace-finding1-001",
+              "name": "invoke_agent rag-agent",
+              "startTimeUnixNano": "0",
+              "endTimeUnixNano": "5000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "rag-agent"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c0",
+              "parentSpanId": "rag-agent",
+              "traceId": "trace-finding1-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "0",
+              "endTimeUnixNano": "300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "400"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "60"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "e0",
+              "parentSpanId": "rag-agent",
+              "traceId": "trace-finding1-001",
+              "name": "embeddings",
+              "startTimeUnixNano": "300000000",
+              "endTimeUnixNano": "500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "embeddings"
+                  }
+                },
+                {
+                  "key": "gen_ai.embeddings.input",
+                  "value": {
+                    "stringValue": "renewable energy policy"
+                  }
+                },
+                {
+                  "key": "retrieval.chunks",
+                  "value": {
+                    "stringValue": "[\"No new policy details found beyond prior summary.\"]"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c1",
+              "parentSpanId": "rag-agent",
+              "traceId": "trace-finding1-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "600000000",
+              "endTimeUnixNano": "900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "400"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "60"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "e1",
+              "parentSpanId": "rag-agent",
+              "traceId": "trace-finding1-001",
+              "name": "embeddings",
+              "startTimeUnixNano": "900000000",
+              "endTimeUnixNano": "1100000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "embeddings"
+                  }
+                },
+                {
+                  "key": "gen_ai.embeddings.input",
+                  "value": {
+                    "stringValue": "renewable energy policy update"
+                  }
+                },
+                {
+                  "key": "retrieval.chunks",
+                  "value": {
+                    "stringValue": "[\"No new policy details found beyond prior summary.\"]"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c2",
+              "parentSpanId": "rag-agent",
+              "traceId": "trace-finding1-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "1200000000",
+              "endTimeUnixNano": "1500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "400"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "60"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "e2",
+              "parentSpanId": "rag-agent",
+              "traceId": "trace-finding1-001",
+              "name": "embeddings",
+              "startTimeUnixNano": "1500000000",
+              "endTimeUnixNano": "1700000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "embeddings"
+                  }
+                },
+                {
+                  "key": "gen_ai.embeddings.input",
+                  "value": {
+                    "stringValue": "energy policy renewable update"
+                  }
+                },
+                {
+                  "key": "retrieval.chunks",
+                  "value": {
+                    "stringValue": "[\"No new policy details found beyond prior summary.\"]"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c3",
+              "parentSpanId": "rag-agent",
+              "traceId": "trace-finding1-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "1800000000",
+              "endTimeUnixNano": "2100000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "400"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "60"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "e3",
+              "parentSpanId": "rag-agent",
+              "traceId": "trace-finding1-001",
+              "name": "embeddings",
+              "startTimeUnixNano": "2100000000",
+              "endTimeUnixNano": "2300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "embeddings"
+                  }
+                },
+                {
+                  "key": "gen_ai.embeddings.input",
+                  "value": {
+                    "stringValue": "policy update renewable energy"
+                  }
+                },
+                {
+                  "key": "retrieval.chunks",
+                  "value": {
+                    "stringValue": "[\"No new policy details found beyond prior summary.\"]"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "c4",
+              "parentSpanId": "rag-agent",
+              "traceId": "trace-finding1-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "2400000000",
+              "endTimeUnixNano": "2700000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "400"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "60"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "e4",
+              "parentSpanId": "rag-agent",
+              "traceId": "trace-finding1-001",
+              "name": "embeddings",
+              "startTimeUnixNano": "2700000000",
+              "endTimeUnixNano": "2900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "embeddings"
+                  }
+                },
+                {
+                  "key": "gen_ai.embeddings.input",
+                  "value": {
+                    "stringValue": "renewable policy energy update"
+                  }
+                },
+                {
+                  "key": "retrieval.chunks",
+                  "value": {
+                    "stringValue": "[\"No new policy details found beyond prior summary.\"]"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

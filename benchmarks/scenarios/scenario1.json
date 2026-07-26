@@ -1,0 +1,1361 @@
+{
+  "resourceSpans": [
+    {
+      "resource": {
+        "attributes": [
+          {
+            "key": "service.name",
+            "value": {
+              "stringValue": "customer-support-system"
+            }
+          }
+        ]
+      },
+      "scopeSpans": [
+        {
+          "scope": {
+            "name": "customer-support-system"
+          },
+          "spans": [
+            {
+              "spanId": "orchestrator",
+              "parentSpanId": "",
+              "traceId": "trace-cs-001",
+              "name": "invoke_agent orchestrator",
+              "startTimeUnixNano": "0",
+              "endTimeUnixNano": "30000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "orchestrator"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "orch-c0",
+              "parentSpanId": "orchestrator",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "0",
+              "endTimeUnixNano": "800000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "1200"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "150"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "orch-c1",
+              "parentSpanId": "orchestrator",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "900000000",
+              "endTimeUnixNano": "1700000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "1400"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "140"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "orch-c2",
+              "parentSpanId": "orchestrator",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "1800000000",
+              "endTimeUnixNano": "3800000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "1600"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "80"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.reasoning_tokens",
+                  "value": {
+                    "intValue": "900"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "orch-c3",
+              "parentSpanId": "orchestrator",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "3900000000",
+              "endTimeUnixNano": "4700000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "1750"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "200"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "billing-agent",
+              "parentSpanId": "orchestrator",
+              "traceId": "trace-cs-001",
+              "name": "invoke_agent billing-agent",
+              "startTimeUnixNano": "4800000000",
+              "endTimeUnixNano": "10800000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "billing-agent"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "bill-l0",
+              "parentSpanId": "billing-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "4800000000",
+              "endTimeUnixNano": "5200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "300"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "60"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "bill-t0",
+              "parentSpanId": "billing-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool check_invoice",
+              "startTimeUnixNano": "5200000000",
+              "endTimeUnixNano": "5500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "check_invoice"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"id\": \"INV-501\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "invoice found, total $84.20"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "bill-l1",
+              "parentSpanId": "billing-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "5700000000",
+              "endTimeUnixNano": "6100000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "320"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "60"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "bill-t1",
+              "parentSpanId": "billing-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool check_invoice",
+              "startTimeUnixNano": "6100000000",
+              "endTimeUnixNano": "6400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "check_invoice"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"id\": \"INV-501\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "invoice found, total $84.20"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "bill-l2",
+              "parentSpanId": "billing-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "6600000000",
+              "endTimeUnixNano": "7000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "340"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "70"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "bill-t2",
+              "parentSpanId": "billing-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool apply_refund",
+              "startTimeUnixNano": "7000000000",
+              "endTimeUnixNano": "7300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "apply_refund"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"amount\": 84.2, \"id\": \"INV-501\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "refund applied"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "bill-l3",
+              "parentSpanId": "billing-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-sonnet-4-6",
+              "startTimeUnixNano": "7500000000",
+              "endTimeUnixNano": "8000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-sonnet-4-6"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "360"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "90"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "technical-agent",
+              "parentSpanId": "orchestrator",
+              "traceId": "trace-cs-001",
+              "name": "invoke_agent technical-agent",
+              "startTimeUnixNano": "10900000000",
+              "endTimeUnixNano": "18900000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "technical-agent"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-l0",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-haiku-4-5",
+              "startTimeUnixNano": "10900000000",
+              "endTimeUnixNano": "11200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-haiku-4-5"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "500"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "50"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-t0",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool diagnose_connection",
+              "startTimeUnixNano": "11200000000",
+              "endTimeUnixNano": "11400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "diagnose_connection"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 0}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "still failing: timeout on port 443"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-l1",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-haiku-4-5",
+              "startTimeUnixNano": "11450000000",
+              "endTimeUnixNano": "11750000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-haiku-4-5"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "500"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "50"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-t1",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool diagnose_connection",
+              "startTimeUnixNano": "11750000000",
+              "endTimeUnixNano": "11950000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "diagnose_connection"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 1}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "still failing: timeout on port 443"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-l2",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-haiku-4-5",
+              "startTimeUnixNano": "12000000000",
+              "endTimeUnixNano": "12300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-haiku-4-5"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "500"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "50"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-t2",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool diagnose_connection",
+              "startTimeUnixNano": "12300000000",
+              "endTimeUnixNano": "12500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "diagnose_connection"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 2}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "still failing: timeout on port 443"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-l3",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-haiku-4-5",
+              "startTimeUnixNano": "12550000000",
+              "endTimeUnixNano": "12850000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-haiku-4-5"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "500"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "50"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-t3",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool diagnose_connection",
+              "startTimeUnixNano": "12850000000",
+              "endTimeUnixNano": "13050000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "diagnose_connection"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 3}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "still failing: timeout on port 443"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-l4",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-haiku-4-5",
+              "startTimeUnixNano": "13100000000",
+              "endTimeUnixNano": "13400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-haiku-4-5"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "500"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "50"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-t4",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool diagnose_connection",
+              "startTimeUnixNano": "13400000000",
+              "endTimeUnixNano": "13600000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "diagnose_connection"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 4}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "still failing: timeout on port 443"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-l5",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat claude-haiku-4-5",
+              "startTimeUnixNano": "13650000000",
+              "endTimeUnixNano": "13950000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "anthropic"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "claude-haiku-4-5"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "500"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "50"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "tech-t5",
+              "parentSpanId": "technical-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool diagnose_connection",
+              "startTimeUnixNano": "13950000000",
+              "endTimeUnixNano": "14150000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "diagnose_connection"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"attempt\": 5}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "still failing: timeout on port 443"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "escalation-agent",
+              "parentSpanId": "orchestrator",
+              "traceId": "trace-cs-001",
+              "name": "invoke_agent escalation-agent",
+              "startTimeUnixNano": "19000000000",
+              "endTimeUnixNano": "26000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "invoke_agent"
+                  }
+                },
+                {
+                  "key": "gen_ai.agent.name",
+                  "value": {
+                    "stringValue": "escalation-agent"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "esc-l0",
+              "parentSpanId": "escalation-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat gpt-5.6-luna",
+              "startTimeUnixNano": "19000000000",
+              "endTimeUnixNano": "19400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "openai"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "gpt-5.6-luna"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "600"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "90"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.cache_creation_input_tokens",
+                  "value": {
+                    "intValue": "1800"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "esc-t0",
+              "parentSpanId": "escalation-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool search_kb",
+              "startTimeUnixNano": "19400000000",
+              "endTimeUnixNano": "19700000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_kb"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"query\": \"billing dispute unresolved\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "no matching articles found"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "esc-l1",
+              "parentSpanId": "escalation-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat gpt-5.6-luna",
+              "startTimeUnixNano": "19900000000",
+              "endTimeUnixNano": "20300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "openai"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "gpt-5.6-luna"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "600"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "90"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "esc-t1",
+              "parentSpanId": "escalation-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool search_kb",
+              "startTimeUnixNano": "20300000000",
+              "endTimeUnixNano": "20600000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_kb"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"query\": \"billing dispute unresolved escalation\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "no matching articles found"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "esc-l2",
+              "parentSpanId": "escalation-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat gpt-5.6-luna",
+              "startTimeUnixNano": "20800000000",
+              "endTimeUnixNano": "21200000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "openai"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "gpt-5.6-luna"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "600"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "90"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "esc-t2",
+              "parentSpanId": "escalation-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool search_kb",
+              "startTimeUnixNano": "21200000000",
+              "endTimeUnixNano": "21500000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_kb"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"query\": \"escalation billing dispute\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "no matching articles found"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "esc-l3",
+              "parentSpanId": "escalation-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat gpt-5.6-luna",
+              "startTimeUnixNano": "21700000000",
+              "endTimeUnixNano": "22100000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "openai"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "gpt-5.6-luna"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "600"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "90"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "esc-t3",
+              "parentSpanId": "escalation-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool search_kb",
+              "startTimeUnixNano": "22100000000",
+              "endTimeUnixNano": "22400000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_kb"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"query\": \"unresolved billing escalation path\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "no matching articles found"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "esc-l4",
+              "parentSpanId": "escalation-agent",
+              "traceId": "trace-cs-001",
+              "name": "chat gpt-5.6-luna",
+              "startTimeUnixNano": "22600000000",
+              "endTimeUnixNano": "23000000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "chat"
+                  }
+                },
+                {
+                  "key": "gen_ai.provider.name",
+                  "value": {
+                    "stringValue": "openai"
+                  }
+                },
+                {
+                  "key": "gen_ai.request.model",
+                  "value": {
+                    "stringValue": "gpt-5.6-luna"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.input_tokens",
+                  "value": {
+                    "intValue": "600"
+                  }
+                },
+                {
+                  "key": "gen_ai.usage.output_tokens",
+                  "value": {
+                    "intValue": "1400"
+                  }
+                }
+              ]
+            },
+            {
+              "spanId": "esc-t4",
+              "parentSpanId": "escalation-agent",
+              "traceId": "trace-cs-001",
+              "name": "execute_tool search_kb",
+              "startTimeUnixNano": "23000000000",
+              "endTimeUnixNano": "23300000000",
+              "attributes": [
+                {
+                  "key": "gen_ai.operation.name",
+                  "value": {
+                    "stringValue": "execute_tool"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.name",
+                  "value": {
+                    "stringValue": "search_kb"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.arguments",
+                  "value": {
+                    "stringValue": "{\"query\": \"billing escalation unresolved dispute\"}"
+                  }
+                },
+                {
+                  "key": "gen_ai.tool.call.result",
+                  "value": {
+                    "stringValue": "no matching articles found"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
