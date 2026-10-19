@@ -19,7 +19,12 @@ its worst offender, not one finding per call.
 
 from __future__ import annotations
 
-from wattage.detectors.base import AnalysisContext, ordered_llm_calls, ordered_tool_calls
+from wattage.detectors.base import (
+    AnalysisContext,
+    ordered_llm_calls,
+    ordered_tool_calls,
+    rate_card_for,
+)
 from wattage.models import Finding, FindingBasis, QualityRisk, Session, Severity, ToolCall
 from wattage.pricing.registry import UnknownModelError
 
@@ -42,9 +47,16 @@ class ToolResultBloatDetector:
             input_rate = 0.0
             if llm_calls:
                 try:
-                    input_rate = ctx.pricing.registry.get(
-                        llm_calls[0].provider, llm_calls[0].model
-                    ).input
+                    # rate_card_for() pins the rate card to the call's own
+                    # timestamp, so a model priced through dated rate windows
+                    # (Google's promo pricing) is read at the rate the call
+                    # was actually billed at -- not at whichever window
+                    # covers the day the analysis runs. A bare
+                    # registry.get() here priced a call from a cheap promo
+                    # window at the current (higher) window's rate,
+                    # inflating the reported waste by the ratio between the
+                    # two windows.
+                    input_rate = rate_card_for(ctx.pricing.registry, llm_calls[0]).input
                 except UnknownModelError:
                     input_rate = 0.0
 

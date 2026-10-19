@@ -7,6 +7,11 @@ task's input rate, capped at the task's actual billed dollars, with basis
 waste than the task cost in the first place.
 """
 
+from datetime import datetime, timezone
+from pathlib import Path
+
+import pytest
+
 from wattage.config import WattageConfig
 from wattage.detectors.base import AnalysisContext
 from wattage.detectors.tool_result_bloat import ToolResultBloatDetector
@@ -117,3 +122,77 @@ def test_result_exactly_at_the_ceiling_is_not_flagged() -> None:
     engine = PricingEngine(PricingRegistry.load())
     findings = _analyze(engine, [_llm(engine, "l1")], [_tool("t1", "x" * _CEILING)])
     assert findings == []
+
+
+# A model priced through dated rate windows -- the shape of Google's promo
+# pricing (gemini-3.7-flash: promo rates through 2026-12-31, higher rates
+# from 2027-01-01) in the vendored pricing snapshot. The cheap window is
+# dated in the past and the expensive one has no end date, so the window
+# covering "now" is always the expensive one -- which is exactly how a
+# trace recorded during the cheap window gets mispriced.
+_WINDOWED_PRICING = """
+version: "test-windowed"
+providers:
+  google:
+    test-windowed-model:
+      rates:
+        - from: "2000-01-01"
+          until: "2000-12-31"
+          input: 1.0e-6
+          output: 2.0e-6
+        - from: "2001-01-01"
+          input: 9.0e-6
+          output: 9.0e-6
+"""
+
+_CHEAP_WINDOW_RATE = 1.0e-6
+_EXPENSIVE_WINDOW_RATE = 9.0e-6
+
+
+def test_waste_is_priced_at_the_rate_window_the_call_was_billed_under(
+    tmp_path: Path,
+) -> None:
+    """The waste figure must be priced at the rate the call was ACTUALLY
+    billed at, not at whichever rate window covers the day the analysis
+    happens to run.
+
+    Every other detector resolves its rate card through rate_card_for(),
+    which pins the window to the call's own timestamp ("a trace from a
+    promo-pricing period must not have its waste priced at the post-promo
+    rate" -- detectors/base.py). This detector resolved a bare
+    registry.get() instead, so a call made during a cheap dated window was
+    priced at the current (expensive) window's rate, inflating the reported
+    waste by the ratio between the two windows.
+    """
+    pricing_path = tmp_path / "pricing.yaml"
+    pricing_path.write_text(_WINDOWED_PRICING, encoding="utf-8")
+    registry = PricingRegistry.load(path=pricing_path)
+    engine = PricingEngine(registry)
+
+    # A call that ran inside the FIRST (cheap) window.
+    call_ns = int(datetime(2000, 6, 15, tzinfo=timezone.utc).timestamp() * 1_000_000_000)
+    call = LLMCall(
+        span_id="l1",
+        provider="google",
+        model="test-windowed-model",
+        usage=TokenUsage(input=1_000_000),
+        start_ns=call_ns,
+        end_ns=call_ns,
+    )
+    call.cost = engine.price_call(call)
+    # The engine prices the call at its own timestamp, so the task's real
+    # bill is at the cheap rate -- and large enough that the "capped at the
+    # task's billed total" rule is not what is under test here.
+    assert call.cost.total == pytest.approx(1_000_000 * _CHEAP_WINDOW_RATE)
+
+    result_len = 100_000
+    findings = _analyze(engine, [call], [_tool("t1", "x" * result_len)])
+
+    assert len(findings) == 1
+    finding = findings[0]
+    excess_tokens = (result_len - _CEILING) // 4
+    assert finding.wasted_tokens == excess_tokens
+    # The rate that was actually in effect when the call ran -- not the
+    # current window's rate, which is 9x higher.
+    assert finding.wasted_dollars == pytest.approx(excess_tokens * _CHEAP_WINDOW_RATE)
+    assert finding.wasted_dollars != pytest.approx(excess_tokens * _EXPENSIVE_WINDOW_RATE)

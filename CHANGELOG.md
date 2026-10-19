@@ -5,6 +5,16 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- The `tool_result_bloat` detector priced its oversized-result waste with a
+  rate card that wasn't pinned to the call's own timestamp, so a model priced
+  through dated rate windows (`google/gemini-3.7-flash` and
+  `google/gemini-3.6-flash` promo pricing) had its waste priced at the
+  window covering the analysis date rather than the one the call was billed
+  under. The waste figure now comes from the call's own rate window, like
+  every other detector's.
+
 ## [0.2.0] — 2026-08-23
 
 The "meet your data where it already is" release: Wattage now reads the
